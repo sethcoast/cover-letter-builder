@@ -10,6 +10,7 @@ function App() {
 
   const handleJobUrlChange = (e) => {
     setJobUrl(e.target.value);
+    console.log(e.target.value);
   };
 
   const handleLinkedinUrlChange = (e) => {
