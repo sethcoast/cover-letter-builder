@@ -1,35 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import axios from 'axios';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [jobUrl, setJobUrl] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
+  const [coverLetter, setCoverLetter] = useState('');
+
+  const handleJobUrlChange = (e) => {
+    setJobUrl(e.target.value);
+  };
+
+  const handleLinkedinUrlChange = (e) => {
+    setLinkedinUrl(e.target.value);
+  };
+
+  const handleResumeFileChange = (e) => {
+    setResumeFile(e.target.files[0]);
+  };
+
+  const handleGenerateCoverLetter = async () => {
+    const formData = new FormData();
+    formData.append('jobUrl', jobUrl);
+    formData.append('linkedinUrl', linkedinUrl);
+    formData.append('resumeFile', resumeFile);
+
+    try {
+      const response = await axios.post('YOUR_BACKEND_ENDPOINT', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      setCoverLetter(response.data.coverLetter);
+    } catch (error) {
+      console.error('Error generating cover letter:', error);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="App">
+      <h1>Cover Letter Generator</h1>
+      <div className="input-group">
+        <label>Job Posting URL:</label>
+        <input type="text" value={jobUrl} onChange={handleJobUrlChange} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="input-group">
+        <label>LinkedIn URL:</label>
+        <input type="text" value={linkedinUrl} onChange={handleLinkedinUrlChange} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <div className="input-group">
+        <label>Resume PDF:</label>
+        <input type="file" accept="application/pdf" onChange={handleResumeFileChange} />
+      </div>
+      <button onClick={handleGenerateCoverLetter}>Write Cover Letter</button>
+      <div className="output-group">
+        <h2>Generated Cover Letter:</h2>
+        <textarea value={coverLetter} readOnly />
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
