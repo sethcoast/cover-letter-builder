@@ -28,11 +28,13 @@ function App() {
     formData.append('resumeFile', resumeFile);
 
     try {
-      const response = await axios.post('YOUR_BACKEND_ENDPOINT', formData, {
+      console.log("here")
+      const response = await axios.post('http://localhost:5001/generate-cover-letter', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
+      console.log(response.data.coverLetter)
       setCoverLetter(response.data.coverLetter);
     } catch (error) {
       console.error('Error generating cover letter:', error);

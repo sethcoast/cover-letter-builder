@@ -3,3 +3,4 @@ backend/data
 backend/notebooks/db
 resume-builder.code-workspace
 .DS_Store
+backend/__pycache__
