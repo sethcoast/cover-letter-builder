@@ -21,6 +21,25 @@ function App() {
     setResumeFile(e.target.files[0]);
   };
 
+  const checkCrewProgress = async() => {
+    try {
+      // This should take an optional parameter which is a list of files that have already been checked
+      // (can be seen if their scrolly boxxes have been made already)
+      const response = await axios.post('http://localhost:5001/check-crew-progress', {
+        headers: {
+          'Content-Type': 'text/html; charset=UTF-8'
+        }
+      });
+
+      // This should be a list of titles / descriptions and their content
+
+      // They should be looped through and a title / scrolly box should be made for each
+
+    } catch (error) {
+      console.error('Error generating cover letter:', error);
+    }
+  }
+
   const handleGenerateCoverLetter = async () => {
     const formData = new FormData();
     formData.append('jobUrl', jobUrl);
@@ -39,7 +58,14 @@ function App() {
     } catch (error) {
       console.error('Error generating cover letter:', error);
     }
-  };
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      checkCrewProgress();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="App">

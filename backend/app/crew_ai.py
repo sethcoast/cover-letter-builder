@@ -23,6 +23,14 @@ read_resume = DirectoryReadTool(file_path='./data')
 search_resume = DirectorySearchTool(file_path='./data')
 semantic_search_resume = PDFSearchTool()
 
+# File names
+file_names = {
+    "candidate_file" : "candidate_profile.md"
+    "job_requirements_file" : "job_requirements.md"
+    "cover_letter_file" : "cover_letter.md"
+    "cover_letter_qa_files" : "cover_letter_review.md"
+}
+
 # Agent Definitions
 profiler = Agent(
     role="Personal Profiler for AI Engineers",
@@ -185,7 +193,7 @@ profile_task = Task(
         "Ensure that you are parsing the entire resume, and correctly extracting and "
         "summarizing the entirety of the candidate's work experiences."
     ),
-    output_file= output_path + "candidate_profile.md",
+    output_file= output_path + file_names['candidate_file'],
     agent=profiler,
     async_execution=True,
 )
@@ -203,7 +211,7 @@ research_task = Task(
         "skills, qualifications, and experiences, as well as preferred "
         "skills qualifications and experiences."
     ),
-    output_file=output_path + "job_requirements.md",
+    output_file=output_path + file_names['job_requirements_file'],
     agent=job_researcher,
     async_execution=True
 )
@@ -232,7 +240,7 @@ cover_letter_compose_task = Task(
         "Express why you are interested in the role and how your"
         "experience aligns with the job requirements."
     ),
-    output_file=output_path + "cover_letter.md",
+    output_file=output_path + file_names['cover_letter_file'],
     context=[research_task, profile_task],
     agent=cover_letter_writer
 )
@@ -250,7 +258,7 @@ review_cover_letter_task = Task(
         "specific suggestions for improvement. The report should include a clear assessment of how well "
         "the cover letter matches the job requirements and any additional advice for making the application stand out."
     ),
-    output_file=output_path+"cover_letter_review.md",
+    output_file=output_path + file_names['cover_letter_qa_file'],
     tools=[scrape_tool],
     agent=cover_letter_reviewer,
     async_execution=False,
@@ -317,3 +325,19 @@ def crew_write_cover_letter(job_url, linkedin_url, resume_file):
     print(result)
     cover_letter = result
     return cover_letter
+
+'''
+    Checks the crew output files, can optionally be passed a a list of
+    already checked files so that they don't need to be checked again
+'''
+def check_crew_progress(already_checked_files = []):
+    worker_progress = {}
+
+    filenames_to_check = [file for file in file_names.keys() if file not in already_checked_files]
+    output_path = os.path.join(output_path)
+    for file in filenames_to_check:
+        total_file_path = output_path + file
+        if os.path.exists(total_file_path):
+            with open(total_file_path, "r") as my_file:
+                worker_progress[file] = my_file.read()
+    return worker_progress
