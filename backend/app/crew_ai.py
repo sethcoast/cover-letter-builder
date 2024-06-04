@@ -12,7 +12,7 @@ import os
 
 # Environment variables
 load_dotenv()
-# os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
+os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
 
@@ -152,13 +152,17 @@ qa_agent = Agent(
         "experiences, and qualifications effectively. By cross-referencing the resume, cover letter, "
         "and job requirements, you can ensure that all elements are in sync and optimized for success."
     ),
+    tools = [scrape_tool,
+             read_resume,
+             search_resume,
+             semantic_search_resume],
     verbose=True,
     allow_delegation=True
 )
 
 
 # Task Definitions
-output_path = './data/output/'
+output_path = 'data/output/'
 
 # Task for Profiler Agent: Compile Comprehensive Profile
 profile_task = Task(
@@ -249,13 +253,13 @@ review_cover_letter_task = Task(
     output_file=output_path+"cover_letter_review.md",
     tools=[scrape_tool],
     agent=cover_letter_reviewer,
-    async_execution=True,
+    async_execution=False,
 )
 
 # Task for QA Agent: Check Consistency
 check_consistency_task = Task(
     description=(
-        "Ensure that the contents of the cover letter are factual and consistent with the job requirements and the candidate's resume. "
+        "Ensure that the contents of the cover letter are factual and consistent with the job requirements {job_posting_url} and the candidate's resume {resume_path}. "
         "Cross-reference the details in each document to identify any discrepancies or gaps. "
         "Focus on ensuring that the information is aligned and presents a cohesive narrative. "
         "Highlight any inconsistencies found and suggest possible corrections."
@@ -267,36 +271,36 @@ check_consistency_task = Task(
     ),
     output_file=output_path+"consistency_report.md",
     agent=qa_agent,
-    async_execution=True
+    async_execution=False
 )
 
 # Assemble the Crew
 cover_letter_crew = Crew(
     agents=[
             profiler,
-            job_researcher,
-            cover_letter_writer,
-            cover_letter_reviewer,
-            qa_agent
+            # job_researcher,
+            # cover_letter_writer,
+            # cover_letter_reviewer,
+            # qa_agent
             ],
 
     tasks=[
             profile_task,
-            research_task,
-            cover_letter_compose_task,
-            review_cover_letter_task,
-            check_consistency_task
+            # research_task,
+            # cover_letter_compose_task,
+            # review_cover_letter_task,
+            # check_consistency_task
            ],
-    manager_llm=ChatOpenAI(model="gpt-4-turbo", 
-                           temperature=0.7),
-    process=Process.hierarchical,
-    # process=Process.sequential,
+    # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
+    #                        temperature=0.7),
+    # process=Process.hierarchical,
+    process=Process.sequential,
     # verbose=True
 )
 
 def crew_write_cover_letter(job_url, linkedin_url, resume_file):
     # save resume file to local directory
-    resume_file_path = os.path.join('./data/input', resume_file.filename)
+    resume_file_path = os.path.join('data/input', resume_file.filename)
     resume_file.save(resume_file_path)
     
     cover_letter_inputs = {
@@ -310,5 +314,6 @@ def crew_write_cover_letter(job_url, linkedin_url, resume_file):
     result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
     
     # agent logic here
-    cover_letter = "Generated cover letter based on input data"
+    print(result)
+    cover_letter = result
     return cover_letter
