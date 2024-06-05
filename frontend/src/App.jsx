@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
+import io from 'socket.io-client';
 
 function App() {
   const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658');
@@ -10,6 +11,18 @@ function App() {
   const [taskId, setTaskId] = useState(null);
   const textareaCrewOutputRef = useRef(null);
   const [coverLetter, setCoverLetter] = useState('');
+
+  // Listen for crew execution logs
+  useEffect(() => {
+    const socket = io('http://localhost:5001');  // Ensure this matches Flask-SocketIO setup
+    socket.on('log', (data) => {
+      setLogs((prevLogs) => prevLogs + '\n' + data.data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   // Handlers
   const handleJobUrlChange = (e) => {

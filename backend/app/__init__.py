@@ -1,17 +1,16 @@
 from flask import Flask
 from flask_cors import CORS
-from .celery_app import make_celery
-from .config import Config
+from .extensions import socketio, init_socketio, celery, init_celery
 
 def create_app(config_class="app.config.Config"):
     app = Flask(__name__)
     app.config.from_object(config_class)
     CORS(app)
-    
-    celery = make_celery(app)
 
-    # with app.app_context():
-    from . import routes
-    app.register_blueprint(routes.bp)
+    init_socketio(app)
+    init_celery(app)
 
-    return app, celery
+    from .routes import bp
+    app.register_blueprint(bp)
+
+    return app

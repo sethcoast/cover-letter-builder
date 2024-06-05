@@ -8,9 +8,15 @@ from crewai_tools import (
   PDFSearchTool,
   SerperDevTool
 )
-from .celery_app import celery
+from .extensions import socketio
+from .logger import setup_logger
+from .extensions import celery
+import logging
 import sys
 import os
+
+# setup logger
+logger = setup_logger(socketio)
 
 # Environment variables
 load_dotenv()
@@ -326,13 +332,35 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path):
         'linkedin_url': linkedin_url,
     }
     
-    # Simulate long-running task
-    self.update_state(state='PROGRESS', meta={'status': 'Crew AI is running...'})
+    # Redirect stdout to the logger
+    sys.stdout = LoggerWriter(logger, logging.INFO)
+    sys.stderr = LoggerWriter(logger, logging.ERROR)
     
-    ### this execution will take a few minutes to run
-    print("Crew AI is running...")
-    result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
-    
-    print(result) 
-    cover_letter = result
-    return {'status': 'Task completed!', 'result': cover_letter}
+    try:
+        logger.info('Crew AI is running...')
+        self.update_state(state='PROGRESS', meta={'status': 'Crew AI is running...'})
+        
+        ### this execution will take a few minutes to run
+        result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
+        self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
+        return {'status': 'Task completed!', 'result': result}
+    except Exception as e:
+        self.update_state(state='FAILURE', meta={'status': 'Task failed!', 'error': str(e)})
+        logger.error(f'Task failed: {str(e)}')
+        raise e
+    finally:
+        # Reset stdout and stderr
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
+class LoggerWriter:
+    def __init__(self, logger, level):
+        self.logger = logger
+        self.level = level
+
+    def write(self, message):
+        if message.strip() != "":
+            self.logger.log(self.level, message)
+
+    def flush(self):
+        pass

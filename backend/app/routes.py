@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
 from .crew_ai import crew_write_cover_letter_task, crew_write_cover_letter
-from .celery_app import celery
+from .extensions import celery
 import os
-import uuid # todo: where to use this?
 
 bp = Blueprint('main', __name__)
 
