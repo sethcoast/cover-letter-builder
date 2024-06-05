@@ -8,6 +8,7 @@ from crewai_tools import (
   PDFSearchTool,
   SerperDevTool
 )
+import sys
 import os
 
 # Environment variables
@@ -243,7 +244,9 @@ review_cover_letter_task = Task(
         "Review cover letters for Y-Combinator startup applications. "
         "Compare them to the provided job requirements at ({job_posting_url}) and give detailed feedback to the cover letter writer. "
         "Focus on how well the candidate's skills and experiences match the job requirements. "
-        "Provide suggestions for improving the cover letter to better align with the job description."
+        "Provide suggestions for improving the cover letter to better align with the job description. "
+        "The feedback should be constructive and actionable, aimed at helping the cover letter writer refine their "
+        "presentation and increase their chances of success."
     ),
     expected_output=(
         "A comprehensive feedback report on the cover letter, highlighting strengths, weaknesses, and "
@@ -259,14 +262,16 @@ review_cover_letter_task = Task(
 # Task for QA Agent: Check Consistency
 check_consistency_task = Task(
     description=(
-        "Ensure that the contents of the cover letter are factual and consistent with the job requirements {job_posting_url} and the candidate's resume {resume_path}. "
+        "Ensure that the contents of the cover letter are factual and consistent with the job "
+        "requirements {job_posting_url} and the candidate's resume {resume_path}. "
         "Cross-reference the details in each document to identify any discrepancies or gaps. "
         "Focus on ensuring that the information is aligned and presents a cohesive narrative. "
-        "Highlight any inconsistencies found and suggest possible corrections."
+        "Highlight any inconsistencies found and suggest possible corrections for the cover letter writer agent."
     ),
     expected_output=(
         "A detailed consistency report that outlines any discrepancies or gaps found between the cover letter and "
-        "other relevant documents (candidate's resume, candidate's linkedIn profile, the job requirements, etc). The report should provide suggestions for corrections to ensure "
+        "other relevant documents (candidate's resume, candidate's linkedIn profile, the job requirements, etc). "
+        "The report should provide suggestions for corrections to ensure "
         "the cover letter is aligned with job requirements and canditate documents, and presents a cohesive narrative."
     ),
     output_file=output_path+"consistency_report.md",
@@ -278,27 +283,36 @@ check_consistency_task = Task(
 cover_letter_crew = Crew(
     agents=[
             profiler,
-            # job_researcher,
-            # cover_letter_writer,
-            # cover_letter_reviewer,
-            # qa_agent
+            job_researcher,
+            cover_letter_writer,
+            cover_letter_reviewer,
+            qa_agent
             ],
 
     tasks=[
             profile_task,
-            # research_task,
-            # cover_letter_compose_task,
-            # review_cover_letter_task,
-            # check_consistency_task
+            research_task,
+            cover_letter_compose_task,
+            review_cover_letter_task,
+            check_consistency_task
            ],
-    # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
-    #                        temperature=0.7),
-    # process=Process.hierarchical,
-    process=Process.sequential,
+    manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
+                           temperature=0.7),
+    process=Process.hierarchical,
+    # process=Process.sequential,
     # verbose=True
 )
 
 def crew_write_cover_letter(job_url, linkedin_url, resume_file):
+    # log crew output to file
+    log_filename = "crew_output.log"
+    # Open the file in write mode to clear its contents
+    with open(log_filename, 'w') as file:
+        pass  # Just opening the file in 'w' mode is enough to clear its contents
+    
+    sys.stdout = Logger(log_filename)
+    
+    # todo: only save file if it doesn't exist
     # save resume file to local directory
     resume_file_path = os.path.join('data/input', resume_file.filename)
     resume_file.save(resume_file_path)
@@ -309,11 +323,28 @@ def crew_write_cover_letter(job_url, linkedin_url, resume_file):
         'linkedin_url': linkedin_url,
     }
     
-    ### this execution will take a few minutes to run
-    print("Crew AI is running...")
-    result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
-    
-    # agent logic here
-    print(result)
-    cover_letter = result
-    return cover_letter
+    try:
+        ### this execution will take a few minutes to run
+        print("Crew AI is running...")
+        result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
+        
+        # agent logic here
+        print(result) 
+        cover_letter = result
+        return cover_letter
+    finally:
+        sys.stdout.log.close()
+        sys.stdout = sys.stdout.terminal
+
+class Logger:
+    def __init__(self, filename):
+        self.terminal = sys.stdout
+        self.log = open(filename, "a")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
