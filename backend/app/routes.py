@@ -22,26 +22,3 @@ def generate_cover_letter():
     cover_letter = crew_write_cover_letter(job_url, linkedin_url, resume_file)
 
     return jsonify({'coverLetter': cover_letter})
-
-@bp.route('/clear-logs', methods=['GET'])
-def clear_logs():
-    log_filename = "crew_output.log"
-    log_filepath = os.path.abspath(log_filename)
-    if os.path.exists(log_filepath):
-        # print("Log file found")
-        os.remove(log_filepath)
-        return jsonify({'message': 'Log file cleared'})
-    else:
-        # print("Log fisasssle nota fund")
-        return jsonify({'error': 'Log file not found'}), 404
-
-@bp.route('/get-logs', methods=['GET'])
-def get_logs():
-    log_filename = "crew_output.log"
-    log_filepath = os.path.abspath(log_filename)
-    if os.path.exists(log_filepath):
-        # print("Log file found")
-        return send_file(log_filepath, as_attachment=True)
-    else:
-        # print("Log file not found")
-        return jsonify({'error': 'Log file not found'}), 404

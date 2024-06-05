@@ -304,14 +304,6 @@ cover_letter_crew = Crew(
 )
 
 def crew_write_cover_letter(job_url, linkedin_url, resume_file):
-    # log crew output to file
-    log_filename = "crew_output.log"
-    # Open the file in write mode to clear its contents
-    with open(log_filename, 'w') as file:
-        pass  # Just opening the file in 'w' mode is enough to clear its contents
-    
-    sys.stdout = Logger(log_filename)
-    
     # todo: only save file if it doesn't exist
     # save resume file to local directory
     resume_file_path = os.path.join('data/input', resume_file.filename)
@@ -323,28 +315,11 @@ def crew_write_cover_letter(job_url, linkedin_url, resume_file):
         'linkedin_url': linkedin_url,
     }
     
-    try:
-        ### this execution will take a few minutes to run
-        print("Crew AI is running...")
-        result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
-        
-        # agent logic here
-        print(result) 
-        cover_letter = result
-        return cover_letter
-    finally:
-        sys.stdout.log.close()
-        sys.stdout = sys.stdout.terminal
-
-class Logger:
-    def __init__(self, filename):
-        self.terminal = sys.stdout
-        self.log = open(filename, "a")
-
-    def write(self, message):
-        self.terminal.write(message)
-        self.log.write(message)
-
-    def flush(self):
-        self.terminal.flush()
-        self.log.flush()
+    ### this execution will take a few minutes to run
+    print("Crew AI is running...")
+    result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
+    
+    # agent logic here
+    print(result) 
+    cover_letter = result
+    return cover_letter
