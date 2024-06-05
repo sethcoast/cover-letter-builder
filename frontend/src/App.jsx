@@ -85,6 +85,10 @@ function App() {
     }
   }, [logs]);
 
+
+  // todo: conditionaly render the logs textarea
+  // todo: conditionaly render the areas for the candidate_profile, 
+  //       job_requirements, cover_letter_review, and cover_letter sections
   return (
     <div className="App">
       <h1>Cover Letter Generator</h1>
