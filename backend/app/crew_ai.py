@@ -8,6 +8,7 @@ from crewai_tools import (
   PDFSearchTool,
   SerperDevTool
 )
+from .celery_app import celery
 import sys
 import os
 
@@ -283,32 +284,27 @@ check_consistency_task = Task(
 cover_letter_crew = Crew(
     agents=[
             profiler,
-            job_researcher,
-            cover_letter_writer,
-            cover_letter_reviewer,
-            qa_agent
+            # job_researcher,
+            # cover_letter_writer,
+            # cover_letter_reviewer,
+            # qa_agent
             ],
 
     tasks=[
             profile_task,
-            research_task,
-            cover_letter_compose_task,
-            review_cover_letter_task,
-            check_consistency_task
+            # research_task,
+            # cover_letter_compose_task,
+            # review_cover_letter_task,
+            # check_consistency_task
            ],
-    manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
-                           temperature=0.7),
-    process=Process.hierarchical,
-    # process=Process.sequential,
+    # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
+    #                        temperature=0.7),
+    # process=Process.hierarchical,
+    process=Process.sequential,
     # verbose=True
 )
 
-def crew_write_cover_letter(job_url, linkedin_url, resume_file):
-    # todo: only save file if it doesn't exist
-    # save resume file to local directory
-    resume_file_path = os.path.join('data/input', resume_file.filename)
-    resume_file.save(resume_file_path)
-    
+def crew_write_cover_letter(job_url, linkedin_url, resume_file_path):    
     cover_letter_inputs = {
         'job_posting_url': job_url,
         'resume_path': resume_file_path,
@@ -319,7 +315,24 @@ def crew_write_cover_letter(job_url, linkedin_url, resume_file):
     print("Crew AI is running...")
     result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
     
-    # agent logic here
+    cover_letter = "computation complete"
+    return cover_letter
+
+@celery.task(bind=True)
+def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path):
+    cover_letter_inputs = {
+        'job_posting_url': job_url,
+        'resume_path': resume_file_path,
+        'linkedin_url': linkedin_url,
+    }
+    
+    # Simulate long-running task
+    self.update_state(state='PROGRESS', meta={'status': 'Crew AI is running...'})
+    
+    ### this execution will take a few minutes to run
+    print("Crew AI is running...")
+    result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
+    
     print(result) 
     cover_letter = result
-    return cover_letter
+    return {'status': 'Task completed!', 'result': cover_letter}

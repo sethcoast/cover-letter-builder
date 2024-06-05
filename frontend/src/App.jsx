@@ -6,7 +6,8 @@ function App() {
   const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658');
   const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/seth-donaldson/');
   const [resumeFile, setResumeFile] = useState(null);
-  const [logs, setLogs] = useState('');
+  const [logs, setLogs] = useState(''); // todo: remove?
+  const [taskId, setTaskId] = useState(null);
   const textareaCrewOutputRef = useRef(null);
   const [coverLetter, setCoverLetter] = useState('');
 
@@ -32,17 +33,37 @@ function App() {
 
     try {
       console.log("here")
-      const response = await axios.post('http://localhost:5001/generate-cover-letter', formData, {
+      const response = await axios.post('http://localhost:5001/generate-cover-letter-task', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log(response.data.coverLetter)
-      setCoverLetter(response.data.coverLetter);
+      // setLogs(response.data.coverLetter);
+      setTaskId(response.data.task_id);
     } catch (error) {
       console.error('Error generating cover letter:', error);
     }
   };
+
+  useEffect(() => {
+    const fetchTaskStatus = async () => {
+      if (taskId) {
+        try {
+          const response = await axios.get(`http://localhost:5001/status/${taskId}`);
+          const { status, result } = response.data;
+          setLogs(status);
+          if (result) {
+            setCoverLetter(result);
+          }
+        } catch (error) {
+          console.error('Error fetching task status:', error);
+        }
+      }
+    };
+
+    const interval = setInterval(fetchTaskStatus, 500);
+    return () => clearInterval(interval);
+  }, [taskId]);
 
   // todo: conditionaly render the logs textarea
   // todo: conditionaly render the areas for the candidate_profile, 
