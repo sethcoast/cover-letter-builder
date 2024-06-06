@@ -21,6 +21,7 @@ function App() {
 
     return () => {
       socket.disconnect();
+      console.log('Socket disconnected');
     };
   }, []);
 
@@ -58,6 +59,17 @@ function App() {
     }
   };
 
+  const handleCancelExecution = async () => {
+    if (taskId) {
+      try {
+        await axios.post(`http://localhost:5001/cancel-task/${taskId}`);
+        setTaskId(null);
+      } catch (error) {
+        console.error('Error canceling execution:', error);
+      }
+    }
+  }
+
   useEffect(() => {
     const fetchTaskStatus = async () => {
       if (taskId) {
@@ -69,7 +81,7 @@ function App() {
             setCoverLetter(result);
           }
           console.log();
-          if (state === 'SUCCESS') {
+          if (state === 'SUCCESS' || state === 'FAILURE') {
             setTaskId(null);
           }
         } catch (error) {
@@ -106,6 +118,7 @@ function App() {
         <h2>Crew Execution</h2>
         <textarea ref={textareaCrewOutputRef} value={logs} readOnly />
       </div>
+      <button onClick={handleCancelExecution}>Cancel Execution</button>
     </div>
   );
 }

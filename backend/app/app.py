@@ -2,8 +2,10 @@ from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from celery import Celery
+from crewai import Crew, Process
+from langchain_openai import ChatOpenAI
 from app.config import Config
-from app.crew_ai import cover_letter_crew
+from app.crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task
 from app.logger import setup_logger
 import logging
 import sys
@@ -41,12 +43,38 @@ def make_celery(app):
 celery = make_celery(app)
 
 @celery.task(bind=True)
-def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path):
+def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, job_id):
     cover_letter_inputs = {
         'job_posting_url': job_url,
         'resume_path': resume_file_path,
         'linkedin_url': linkedin_url,
     }
+    
+    # Assemble the Crew
+    cover_letter_crew = Crew(
+        agents=[
+                profiler,
+                job_researcher,
+                # cover_letter_writer,
+                # cover_letter_reviewer,
+                # qa_agent
+                ],
+        tasks=[
+                profile_task,
+                research_task,
+                # cover_letter_compose_task,
+                # review_cover_letter_task,
+                # check_consistency_task
+            ],
+        # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
+        #                        temperature=0.7),
+        # process=Process.hierarchical,
+        process=Process.sequential,
+        verbose=True,
+        memory=True,
+        cache=True,
+        output_log_file='data/' + job_id + '/output/crew_log.txt', # todo: figure out how to subscribe to this, also, will it be unique for each user?
+    )
     
     # Redirect stdout to the logger
     sys.stdout = LoggerWriter(logger, logging.INFO)

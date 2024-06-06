@@ -1,6 +1,5 @@
-from crewai import Agent, Task, Crew, Process
+from crewai import Agent, Task
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 from crewai_tools import (
   ScrapeWebsiteTool,
   DirectoryReadTool,
@@ -279,43 +278,43 @@ check_consistency_task = Task(
     async_execution=False
 )
 
-# Assemble the Crew
-cover_letter_crew = Crew(
-    agents=[
-            profiler,
-            # job_researcher,
-            # cover_letter_writer,
-            # cover_letter_reviewer,
-            # qa_agent
-            ],
+# # Assemble the Crew
+# cover_letter_crew = Crew(
+#     agents=[
+#             profiler,
+#             # job_researcher,
+#             # cover_letter_writer,
+#             # cover_letter_reviewer,
+#             # qa_agent
+#             ],
 
-    tasks=[
-            profile_task,
-            # research_task,
-            # cover_letter_compose_task,
-            # review_cover_letter_task,
-            # check_consistency_task
-           ],
-    # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
-    #                        temperature=0.7),
-    # process=Process.hierarchical,
-    process=Process.sequential,
-    # verbose=True
-    memory=True,
-    cache=True,
-    output_log_file='data/output/crew_log.txt', # todo: figure out how to subscribe to this, also, will it be unique for each user?
-)
+#     tasks=[
+#             profile_task,
+#             # research_task,
+#             # cover_letter_compose_task,
+#             # review_cover_letter_task,
+#             # check_consistency_task
+#            ],
+#     # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
+#     #                        temperature=0.7),
+#     # process=Process.hierarchical,
+#     process=Process.sequential,
+#     # verbose=True
+#     memory=True,
+#     cache=True,
+#     output_log_file='data/output/crew_log.txt', # todo: figure out how to subscribe to this, also, will it be unique for each user?
+# )
 
-def crew_write_cover_letter(job_url, linkedin_url, resume_file_path):    
-    cover_letter_inputs = {
-        'job_posting_url': job_url,
-        'resume_path': resume_file_path,
-        'linkedin_url': linkedin_url,
-    }
+# def crew_write_cover_letter(job_url, linkedin_url, resume_file_path):    
+#     cover_letter_inputs = {
+#         'job_posting_url': job_url,
+#         'resume_path': resume_file_path,
+#         'linkedin_url': linkedin_url,
+#     }
     
-    ### this execution will take a few minutes to run
-    print("Crew AI is running...")
-    result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
+#     ### this execution will take a few minutes to run
+#     print("Crew AI is running...")
+#     result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
     
-    cover_letter = "computation complete"
-    return cover_letter
+#     cover_letter = "computation complete"
+#     return cover_letter
