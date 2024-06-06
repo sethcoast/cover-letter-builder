@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .crew_ai import crew_write_cover_letter_task, crew_write_cover_letter
-from .extensions import celery
+from .crew_ai import crew_write_cover_letter
 import os
 
 bp = Blueprint('main', __name__)
@@ -30,6 +29,7 @@ def generate_cover_letter():
 
 @bp.route('/generate-cover-letter-task', methods=['POST'])
 def generate_cover_letter_task():
+    from .app import crew_write_cover_letter_task
     job_url = request.form['jobUrl']
     linkedin_url = request.form['linkedinUrl']
     resume_file = request.files['resumeFile']
@@ -49,7 +49,10 @@ def generate_cover_letter_task():
 
 @bp.route('/status/<task_id>')
 def task_status(task_id):
+    from .app import celery
+    print("Status endpoint hit! Task ID: ", task_id)
     task = celery.AsyncResult(task_id)
+    print("Task state: ", task.state)
     if task.state == 'PENDING':
         response = {
             'state': task.state,
@@ -66,4 +69,5 @@ def task_status(task_id):
             'state': task.state,
             'status': str(task.info)  # Exception raised
         }
+        print("FAILURE:", response)
     return jsonify(response)
