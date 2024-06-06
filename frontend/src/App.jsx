@@ -25,6 +25,14 @@ function App() {
     };
   }, []);
 
+  // Scroll to the bottom whenever logs changes
+  useEffect(() => {
+    if (textareaCrewOutputRef.current) {
+      textareaCrewOutputRef.current.scrollTop = textareaCrewOutputRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+
   // Handlers
   const handleJobUrlChange = (e) => {
     setJobUrl(e.target.value);

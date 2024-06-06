@@ -186,8 +186,7 @@ profile_task = Task(
         "summarizing the entirety of the candidate's work experiences."
     ),
     output_file= output_path + "candidate_profile.md",
-    agent=profiler,
-    async_execution=True,
+    agent=profiler
 )
 
 # Task for Researcher Agent: Extract Job Requirements
@@ -204,8 +203,7 @@ research_task = Task(
         "skills qualifications and experiences."
     ),
     output_file=output_path + "job_requirements.md",
-    agent=job_researcher,
-    async_execution=True
+    agent=job_researcher
 )
 
 # Task for Cover letter writer Agent: compose cover letter

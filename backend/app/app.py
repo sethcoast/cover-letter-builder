@@ -51,6 +51,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     }
     
     # Assemble the Crew
+    output_log_file = 'data/' + job_id + '/output/crew_log.txt'
     cover_letter_crew = Crew(
         agents=[
                 profiler,
@@ -73,7 +74,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         verbose=True,
         memory=True,
         cache=True,
-        output_log_file='data/' + job_id + '/output/crew_log.txt', # todo: figure out how to subscribe to this, also, will it be unique for each user?
+        output_log_file=output_log_file, # todo: figure out how to subscribe to this, also, will it be unique for each user?
     )
     
     # Redirect stdout to the logger

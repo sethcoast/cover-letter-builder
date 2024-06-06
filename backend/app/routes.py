@@ -62,7 +62,7 @@ def task_status(task_id):
         print("Task state: ", task.state)
     except Exception as e:
         print("Task state error: ", str(e))
-        return jsonify({'status': 'Task not found!'})
+        raise e
         
     if task.state == 'PENDING':
         response = {
