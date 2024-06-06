@@ -1,1 +1,1 @@
-# resume-builder
+# cover-letter-builder

@@ -301,6 +301,9 @@ cover_letter_crew = Crew(
     # process=Process.hierarchical,
     process=Process.sequential,
     # verbose=True
+    memory=True,
+    cache=True,
+    output_log_file='data/output/crew_log.txt', # todo: figure out how to subscribe to this, also, will it be unique for each user?
 )
 
 def crew_write_cover_letter(job_url, linkedin_url, resume_file_path):    
