@@ -13,16 +13,16 @@ function App() {
   const [coverLetter, setCoverLetter] = useState('');
 
   // Listen for crew execution logs
-  // useEffect(() => {
-  //   const socket = io('http://localhost:5001');  // Ensure this matches Flask-SocketIO setup
-  //   socket.on('log', (data) => {
-  //     setLogs((prevLogs) => prevLogs + '\n' + data.data);
-  //   });
+  useEffect(() => {
+    const socket = io('http://localhost:5001');  // Ensure this matches Flask-SocketIO setup
+    socket.on('log', (data) => {
+      setLogs((prevLogs) => prevLogs + '\n' + data.data);
+    });
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   // Handlers
   const handleJobUrlChange = (e) => {
@@ -51,7 +51,7 @@ function App() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setLogs(response.data.task_id);
+      console.log("taskId", response.data.task_id);
       setTaskId(response.data.task_id);
     } catch (error) {
       console.error('Error generating cover letter:', error);
@@ -64,7 +64,7 @@ function App() {
         try {
           const response = await axios.get(`http://localhost:5001/status/${taskId}`);
           const {state, status, result } = response.data;
-          setLogs(status);
+          console.log(status);
           if (result) {
             setCoverLetter(result);
           }
