@@ -8,26 +8,6 @@ bp = Blueprint('main', __name__)
 def hello():
     return "Hello, World!"
 
-@bp.route('/generate-cover-letter', methods=['POST'])
-def generate_cover_letter():
-    from .crew_ai import crew_write_cover_letter
-    job_url = request.form['jobUrl']
-    linkedin_url = request.form['linkedinUrl']
-    resume_file = request.files['resumeFile']
-    
-    print(job_url)
-    print(linkedin_url)
-    print(resume_file)
-    # todo: Actually this might not work. We might need to save it to redis or something
-    # save resume file to local directory
-    resume_file_path = os.path.join('data/input', resume_file.filename)
-    resume_file.save(resume_file_path)
-
-    # Here you would include your agent definitions and processing logic
-    cover_letter = crew_write_cover_letter(job_url, linkedin_url, resume_file_path)
-
-    return jsonify({'coverLetter': cover_letter})
-
 @bp.route('/generate-cover-letter-task', methods=['POST'])
 def generate_cover_letter_task():
     from app.app import crew_write_cover_letter_task
@@ -95,3 +75,24 @@ def cancel_task(task_id):
     celery.control.revoke(task_id, terminate=True, signal='SIGKILL')
     
     return jsonify({'status': 'Task cancelled!'})
+
+# todo: This is a temporary route for testing without Celery. We will remove this later.
+@bp.route('/generate-cover-letter', methods=['POST'])
+def generate_cover_letter():
+    from .crew_ai import crew_write_cover_letter
+    job_url = request.form['jobUrl']
+    linkedin_url = request.form['linkedinUrl']
+    resume_file = request.files['resumeFile']
+    
+    print(job_url)
+    print(linkedin_url)
+    print(resume_file)
+    # todo: Actually this might not work. We might need to save it to redis or something
+    # save resume file to local directory
+    resume_file_path = os.path.join('data/input', resume_file.filename)
+    resume_file.save(resume_file_path)
+
+    # Here you would include your agent definitions and processing logic
+    cover_letter = crew_write_cover_letter(job_url, linkedin_url, resume_file_path)
+
+    return jsonify({'coverLetter': cover_letter})

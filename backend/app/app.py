@@ -9,13 +9,14 @@ from app.crew_ai import profiler, job_researcher, cover_letter_writer, cover_let
 from app.logger import setup_logger
 import logging
 import sys
+import os
 # import eventlet
 
 # eventlet.monkey_patch()
 
 # Initialize the Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app, resources={r"/*": {"origins": "https://localhost:5173"}}, supports_credentials=True)
 
 app.config['SECRET_KEY'] = 'secret!'
 app.config['CELERY_BROKER_URL'] = Config.CELERY_BROKER_URL
@@ -26,7 +27,7 @@ from app.routes import bp
 app.register_blueprint(bp)
 
 # Initialize the SocketIO app
-socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173", message_queue=Config.SOCKET_IO_MESSAGE_QUEUE, async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="https://localhost:5173", message_queue=Config.SOCKET_IO_MESSAGE_QUEUE, async_mode='threading')
 
 # setup logger
 logger = setup_logger(socketio)
@@ -112,4 +113,6 @@ class LoggerWriter:
 
 if __name__ == '__main__':
     print("Running app...")
-    socketio.run(app, debug=True, port='5001')
+    cert_path = os.path.join(os.path.dirname(__file__), 'localhost.pem')
+    key_path = os.path.join(os.path.dirname(__file__), 'localhost-key.pem')
+    socketio.run(app, debug=True, port='5001', ssl_context=(cert_path, key_path))

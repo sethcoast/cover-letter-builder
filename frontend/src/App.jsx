@@ -2,19 +2,34 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 import io from 'socket.io-client';
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
   const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658');
   const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/seth-donaldson/');
   const [resumeFile, setResumeFile] = useState(null);
-  const [logs, setLogs] = useState(''); // todo: remove?
+  const [logs, setLogs] = useState('');
   const [taskId, setTaskId] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
   const textareaCrewOutputRef = useRef(null);
   const [coverLetter, setCoverLetter] = useState('');
 
+  // Immediately start a session, the session ID is used to track the progress of the AI crew output
+  useEffect(() => {
+    let sessionId = sessionStorage.getItem('session_id');
+    if (!sessionId) {
+      sessionId = uuidv4();
+      sessionStorage.setItem('session_id', sessionId);
+      console.log('New session ID created:', sessionId);
+    } else {
+      console.log('Existing session ID found:', sessionId);
+    }
+    setSessionId(sessionId);
+  }, []);
+
   // Listen for crew execution logs
   useEffect(() => {
-    const socket = io('http://localhost:5001');  // Ensure this matches Flask-SocketIO setup
+    const socket = io('https://localhost:5001');  // Ensure this matches Flask-SocketIO setup
     socket.on('log', (data) => {
       setLogs((prevLogs) => prevLogs + '\n' + data.data);
     });
@@ -25,10 +40,16 @@ function App() {
     };
   }, []);
 
+  // todo: update to scroll to the bottom only IF the bar is already at the bottom
   // Scroll to the bottom whenever logs changes
   useEffect(() => {
     if (textareaCrewOutputRef.current) {
-      textareaCrewOutputRef.current.scrollTop = textareaCrewOutputRef.current.scrollHeight;
+      const textarea = textareaCrewOutputRef.current;
+        const isScrolledToBottom = textarea.scrollHeight - textarea.scrollTop === textarea.clientHeight;
+
+        if (isScrolledToBottom) {
+            textarea.scrollTop = textarea.scrollHeight;
+        }
     }
   }, [logs]);
 
@@ -53,9 +74,11 @@ function App() {
     formData.append('linkedinUrl', linkedinUrl);
     formData.append('resumeFile', resumeFile);
 
+    // todo: ensure formData is correct, display popup/dialog if not
+
     try {
       console.log("here")
-      const response = await axios.post('http://localhost:5001/generate-cover-letter-task', formData, {
+      const response = await axios.post('https://localhost:5001/generate-cover-letter-task', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -70,7 +93,7 @@ function App() {
   const handleCancelExecution = async () => {
     if (taskId) {
       try {
-        await axios.post(`http://localhost:5001/cancel-task/${taskId}`);
+        await axios.post(`https://localhost:5001/cancel-task/${taskId}`);
         setTaskId(null);
       } catch (error) {
         console.error('Error canceling execution:', error);
@@ -82,7 +105,7 @@ function App() {
     const fetchTaskStatus = async () => {
       if (taskId) {
         try {
-          const response = await axios.get(`http://localhost:5001/status/${taskId}`);
+          const response = await axios.get(`https://localhost:5001/status/${taskId}`);
           const {state, status, result } = response.data;
           console.log(status);
           if (result) {

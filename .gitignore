@@ -8,3 +8,4 @@ backend/app/__pycache__
 backend/db
 node_modules
 dump.rdb
+.env
