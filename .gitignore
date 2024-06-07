@@ -6,3 +6,5 @@ resume-builder.code-workspace
 backend/__pycache__
 backend/app/__pycache__
 backend/db
+node_modules
+dump.rdb
