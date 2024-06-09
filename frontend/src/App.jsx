@@ -42,6 +42,13 @@ const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
         <textarea ref={crewOutputRef} value={logs} readOnly />
       </div>
     );
+  } else if (taskStatus === 'SUCCESS') {
+    return (
+      <div className="output-group">
+        <p>Cover letter generated successfully!</p>
+        <textarea ref={crewOutputRef} value={logs} readOnly />
+      </div>
+    );
   } else {
     return <div></div>;
   }
@@ -131,6 +138,8 @@ function App() {
       });
       console.log("taskId", response.data.task_id);
       setTaskId(response.data.task_id);
+      setLogs('');
+      setTaskStatus('PENDING');
     } catch (error) {
       console.error('Error generating cover letter:', error);
     }
