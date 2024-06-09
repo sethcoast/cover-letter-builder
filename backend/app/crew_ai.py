@@ -161,9 +161,22 @@ qa_agent = Agent(
 )
 
 
-# Task Definitions
-output_path = 'data/output/'
+# def assemble_and_kickoff_crew(cover_letter_inputs, session_id):
+#     cover_letter_inputs = {
+#         'job_posting_url': job_url,
+#         'resume_path': resume_file_path,
+#         'linkedin_url': linkedin_url,
+#     }
+    
+#     ### this execution will take a few minutes to run
+#     print("Crew AI is running...")
+#     result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
+    
+#     cover_letter = "computation complete"
+#     return cover_letter
 
+
+# Task Definitions
 # Task for Profiler Agent: Compile Comprehensive Profile
 profile_task = Task(
     description=(
@@ -185,7 +198,7 @@ profile_task = Task(
         "Ensure that you are parsing the entire resume, and correctly extracting and "
         "summarizing the entirety of the candidate's work experiences."
     ),
-    output_file= output_path + "candidate_profile.md",
+    output_file="candidate_profile.md",
     agent=profiler
 )
 
@@ -202,7 +215,7 @@ research_task = Task(
         "skills, qualifications, and experiences, as well as preferred "
         "skills qualifications and experiences."
     ),
-    output_file=output_path + "job_requirements.md",
+    output_file="job_requirements.md",
     agent=job_researcher
 )
 
@@ -230,7 +243,7 @@ cover_letter_compose_task = Task(
         "Express why you are interested in the role and how your"
         "experience aligns with the job requirements."
     ),
-    output_file=output_path + "cover_letter.md",
+    output_file="cover_letter.md",
     context=[research_task, profile_task],
     agent=cover_letter_writer
 )
@@ -250,7 +263,7 @@ review_cover_letter_task = Task(
         "specific suggestions for improvement. The report should include a clear assessment of how well "
         "the cover letter matches the job requirements and any additional advice for making the application stand out."
     ),
-    output_file=output_path+"cover_letter_review.md",
+    output_file="cover_letter_review.md",
     tools=[scrape_tool],
     agent=cover_letter_reviewer,
     async_execution=False,
@@ -271,7 +284,7 @@ check_consistency_task = Task(
         "The report should provide suggestions for corrections to ensure "
         "the cover letter is aligned with job requirements and canditate documents, and presents a cohesive narrative."
     ),
-    output_file=output_path+"consistency_report.md",
+    output_file="consistency_report.md",
     agent=qa_agent,
     async_execution=False
 )

@@ -44,12 +44,7 @@ function App() {
   // Scroll to the bottom whenever logs changes
   useEffect(() => {
     if (textareaCrewOutputRef.current) {
-      const textarea = textareaCrewOutputRef.current;
-        const isScrolledToBottom = textarea.scrollHeight - textarea.scrollTop === textarea.clientHeight;
-
-        if (isScrolledToBottom) {
-            textarea.scrollTop = textarea.scrollHeight;
-        }
+      textareaCrewOutputRef.current.scrollTop = textareaCrewOutputRef.current.scrollHeight;
     }
   }, [logs]);
 
@@ -80,7 +75,8 @@ function App() {
       console.log("here")
       const response = await axios.post('https://localhost:5001/generate-cover-letter-task', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          'x-session-id': sessionId,
         }
       });
       console.log("taskId", response.data.task_id);
@@ -121,7 +117,6 @@ function App() {
         }
       }
     };
-
     const interval = setInterval(fetchTaskStatus, 500);
     return () => clearInterval(interval);
   }, [taskId]);

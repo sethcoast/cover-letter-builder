@@ -11,7 +11,7 @@ def hello():
 @bp.route('/generate-cover-letter-task', methods=['POST'])
 def generate_cover_letter_task():
     from app.app import crew_write_cover_letter_task
-    job_id = str(uuid.uuid4())
+    session_id = request.headers.get('x-session-id')
     job_url = request.form['jobUrl']
     linkedin_url = request.form['linkedinUrl']
     resume_file = request.files['resumeFile']
@@ -19,17 +19,21 @@ def generate_cover_letter_task():
     print(job_url)
     print(linkedin_url)
     print(resume_file)
-    # todo: Actually this might not work. We might need to save it to redis or something
-    # save resume file to local directory
-    os.mkdir('data/' + job_id)
-    os.mkdir('data/' + job_id + '/input')
-    os.mkdir('data/' + job_id + '/output')
-    resume_file_path = os.path.join('data/' + job_id + '/input', resume_file.filename)
+    # create data directory for the session (if they don't already exist)
+    if not os.path.exists('data'):
+        os.mkdir('data')
+        if not os.path.exists('data' + session_id):
+            os.mkdir('data/' + session_id)
+            os.mkdir('data/' + session_id + '/input')
+            os.mkdir('data/' + session_id + '/output')
+    # save resume file to local directory (if it doesn't already exist)
+    resume_file_path = os.path.join('data/' + session_id + '/input', resume_file.filename)
     print('resume file path: ', resume_file_path)
-    resume_file.save(resume_file_path)
+    if not os.path.exists(resume_file_path):
+        resume_file.save(resume_file_path)
 
     # Here you would include your agent definitions and processing logic
-    task = crew_write_cover_letter_task.apply_async(args=[job_url, linkedin_url, resume_file_path, job_id])
+    task = crew_write_cover_letter_task.apply_async(args=[job_url, linkedin_url, resume_file_path, session_id])
 
     return jsonify({'task_id': task.id})
 
@@ -42,7 +46,7 @@ def task_status(task_id):
         print("Task state: ", task.state)
     except Exception as e:
         print("Task state error: ", str(e))
-        raise e
+        return jsonify({'error': 'Could not retrieve task state', 'details': str(e)}), 500
         
     if task.state == 'PENDING':
         response = {
@@ -63,7 +67,7 @@ def task_status(task_id):
     else:
         response = {
             'state': task.state,
-            'status': str(task.info)  # Exception raised
+            'status': task.info.get('exec_message', str(task.info))  # Exception raised
         }
         print("FAILURE:", response)
     return jsonify(response)

@@ -5,9 +5,10 @@ from celery import Celery
 from crewai import Crew, Process
 from langchain_openai import ChatOpenAI
 from app.config import Config
-from app.crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task
+from app.crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
 from app.logger import setup_logger
 import logging
+import ssl
 import sys
 import os
 # import eventlet
@@ -44,15 +45,22 @@ def make_celery(app):
 celery = make_celery(app)
 
 @celery.task(bind=True)
-def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, job_id):
+def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, session_id):
     cover_letter_inputs = {
         'job_posting_url': job_url,
         'resume_path': resume_file_path,
         'linkedin_url': linkedin_url,
     }
     
+    # reassign the path of the output files for each of the tasks
+    profile_task.output_file = 'data/' + session_id + '/output/' + profile_task.output_file
+    research_task.output_file = 'data/' + session_id + '/output/' + research_task.output_file
+    cover_letter_compose_task.output_file = 'data/' + session_id + '/output/' + cover_letter_compose_task.output_file
+    review_cover_letter_task.output_file = 'data/' + session_id + '/output/' + review_cover_letter_task.output_file
+    check_consistency_task.output_file = 'data/' + session_id + '/output/' + check_consistency_task.output_file
+    
     # Assemble the Crew
-    output_log_file = 'data/' + job_id + '/output/crew_log.txt'
+    output_log_file = 'data/' + session_id + '/output/crew_log.txt'
     cover_letter_crew = Crew(
         agents=[
                 profiler,
@@ -73,9 +81,8 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         # process=Process.hierarchical,
         process=Process.sequential,
         verbose=True,
-        memory=True,
-        cache=True,
-        output_log_file=output_log_file, # todo: figure out how to subscribe to this, also, will it be unique for each user?
+        memory=False,
+        cache=False
     )
     
     # Redirect stdout to the logger
@@ -91,14 +98,15 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
         return {'status': 'Task completed!', 'result': result}
     except Exception as e:
-        self.update_state(state='FAILURE', meta={'status': 'Task failed!', 'error': str(e)})
         logger.error(f'Task failed: {str(e)}')
+        self.update_state(state='FAILURE', meta={'exc_type': type(e).__name__, 'exc_message': str(e)})
         raise e
     finally:
         # Reset stdout and stderr
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
 
+# Custom class to redirect stdout and stderr to the logger
 class LoggerWriter:
     def __init__(self, logger, level):
         self.logger = logger
@@ -113,6 +121,10 @@ class LoggerWriter:
 
 if __name__ == '__main__':
     print("Running app...")
+    print("localhost.pem path: ", os.path.join(os.path.dirname(__file__), 'localhost.pem'))
+    print("localhost-key.pem path: ", os.path.join(os.path.dirname(__file__), 'localhost-key.pem'))
     cert_path = os.path.join(os.path.dirname(__file__), 'localhost.pem')
     key_path = os.path.join(os.path.dirname(__file__), 'localhost-key.pem')
-    socketio.run(app, debug=True, port='5001', ssl_context=(cert_path, key_path))
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(cert_path, key_path)
+    socketio.run(app, debug=True, port='5001', ssl_context=context)
