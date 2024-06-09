@@ -53,11 +53,11 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     }
     
     # reassign the path of the output files for each of the tasks
-    profile_task.output_file = 'data/' + session_id + '/output/' + profile_task.output_file
-    research_task.output_file = 'data/' + session_id + '/output/' + research_task.output_file
-    cover_letter_compose_task.output_file = 'data/' + session_id + '/output/' + cover_letter_compose_task.output_file
-    review_cover_letter_task.output_file = 'data/' + session_id + '/output/' + review_cover_letter_task.output_file
-    check_consistency_task.output_file = 'data/' + session_id + '/output/' + check_consistency_task.output_file
+    profile_task.output_file = 'data/' + session_id + '/output/candidate_profile.md'
+    research_task.output_file = 'data/' + session_id + '/output/job_requirements.md'
+    cover_letter_compose_task.output_file = 'data/' + session_id + '/output/cover_letter.md'
+    review_cover_letter_task.output_file = 'data/' + session_id + '/output/cover_letter_review.md'
+    check_consistency_task.output_file = 'data/' + session_id + '/output/consistency_report.md'
     
     # Assemble the Crew
     output_log_file = 'data/' + session_id + '/output/crew_log.txt'

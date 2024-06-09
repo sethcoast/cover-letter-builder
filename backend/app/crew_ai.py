@@ -198,7 +198,6 @@ profile_task = Task(
         "Ensure that you are parsing the entire resume, and correctly extracting and "
         "summarizing the entirety of the candidate's work experiences."
     ),
-    output_file="candidate_profile.md",
     agent=profiler
 )
 
@@ -215,7 +214,6 @@ research_task = Task(
         "skills, qualifications, and experiences, as well as preferred "
         "skills qualifications and experiences."
     ),
-    output_file="job_requirements.md",
     agent=job_researcher
 )
 
@@ -243,7 +241,6 @@ cover_letter_compose_task = Task(
         "Express why you are interested in the role and how your"
         "experience aligns with the job requirements."
     ),
-    output_file="cover_letter.md",
     context=[research_task, profile_task],
     agent=cover_letter_writer
 )
@@ -263,7 +260,6 @@ review_cover_letter_task = Task(
         "specific suggestions for improvement. The report should include a clear assessment of how well "
         "the cover letter matches the job requirements and any additional advice for making the application stand out."
     ),
-    output_file="cover_letter_review.md",
     tools=[scrape_tool],
     agent=cover_letter_reviewer,
     async_execution=False,
@@ -284,7 +280,6 @@ check_consistency_task = Task(
         "The report should provide suggestions for corrections to ensure "
         "the cover letter is aligned with job requirements and canditate documents, and presents a cohesive narrative."
     ),
-    output_file="consistency_report.md",
     agent=qa_agent,
     async_execution=False
 )

@@ -4,14 +4,56 @@ import './App.css';
 import io from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
+const OutputFiles = ({taskStatus}) => {
+  if (taskStatus !== 'SUCCESS') {
+    return <div></div>;
+  } else {
+    return (
+      <div>
+        <h2>Output Files</h2>
+        <div className="output-group">
+          <h3>Candidate Profile</h3>
+          <p>Download</p>
+        </div>
+        <div className="output-group">
+          <h3>Job Requirements</h3>
+          <p>Download</p>
+        </div>
+        <div className="output-group">
+          <h3>Cover Letter Review</h3>
+          <p>Download</p>
+        </div>
+        <div className="output-group">
+          <h3>Cover Letter</h3>
+          <p>Download</p>
+        </div>
+      </div>
+    );
+  }
+}
+
+const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
+  if (taskStatus !== null) {
+    return (
+      <div className="output-group">
+        <p>Generating cover letter...</p>
+        <textarea ref={crewOutputRef} value={logs} readOnly />
+      </div>
+    );
+  } else {
+    return <div></div>;
+  }
+}
+
 function App() {
   const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658');
   const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/seth-donaldson/');
   const [resumeFile, setResumeFile] = useState(null);
   const [logs, setLogs] = useState('');
   const [taskId, setTaskId] = useState(null);
+  const [taskStatus, setTaskStatus] = useState(null);
   const [sessionId, setSessionId] = useState(null);
-  const textareaCrewOutputRef = useRef(null);
+  const crewOutputRef = useRef(null);
   const [coverLetter, setCoverLetter] = useState('');
 
   // Immediately start a session, the session ID is used to track the progress of the AI crew output
@@ -43,8 +85,8 @@ function App() {
   // todo: update to scroll to the bottom only IF the bar is already at the bottom
   // Scroll to the bottom whenever logs changes
   useEffect(() => {
-    if (textareaCrewOutputRef.current) {
-      textareaCrewOutputRef.current.scrollTop = textareaCrewOutputRef.current.scrollHeight;
+    if (crewOutputRef.current) {
+      crewOutputRef.current.scrollTop = crewOutputRef.current.scrollHeight;
     }
   }, [logs]);
 
@@ -104,9 +146,7 @@ function App() {
           const response = await axios.get(`https://localhost:5001/status/${taskId}`);
           const {state, status, result } = response.data;
           console.log(status);
-          if (result) {
-            setCoverLetter(result);
-          }
+          setTaskStatus(state);
           console.log();
           if (state === 'SUCCESS' || state === 'FAILURE') {
             setTaskId(null);
@@ -114,6 +154,7 @@ function App() {
         } catch (error) {
           console.error('Error fetching task status:', error);
           setTaskId(null);
+          setTaskStatus(null);
         }
       }
     };
@@ -140,10 +181,8 @@ function App() {
         <input type="file" accept="application/pdf" onChange={handleResumeFileChange} />
       </div>
       <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
-      <div className="output-group">
-        <h2>Crew Execution</h2>
-        <textarea ref={textareaCrewOutputRef} value={logs} readOnly />
-      </div>
+      <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
+      <OutputFiles taskStatus={taskStatus} />
       <button onClick={handleCancelExecution}>Cancel Execution</button>
     </div>
   );
