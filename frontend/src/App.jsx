@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import './App.css';
 import io from 'socket.io-client';
@@ -107,6 +109,12 @@ function App() {
 
   const handleGenerateCoverLetter = async () => {
     const formData = new FormData();
+    if (!jobUrl || !linkedinUrl || !resumeFile) {
+      console.error('Missing required fields');
+      // display popup/dialog
+      toast.warn('Please fill out all fields before submitting the form.');
+      return;
+    }
     formData.append('jobUrl', jobUrl);
     formData.append('linkedinUrl', linkedinUrl);
     formData.append('resumeFile', resumeFile);
@@ -167,6 +175,7 @@ function App() {
   //       job_requirements, cover_letter_review, and cover_letter sections
   return (
     <div className="App">
+      <ToastContainer />
       <h1>Cover Letter Generator</h1>
       <div className="input-group">
         <label>Job Posting URL:</label>
