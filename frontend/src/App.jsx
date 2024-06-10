@@ -35,7 +35,10 @@ const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
   if (taskStatus !== null) {
     return (
       <div className="output-group">
-        <p>Generating cover letter...</p>
+        {taskStatus === 'SUCCESS' ? 
+        <p>Cover letter generated successfully!</p> : 
+        <p>Generating cover letter... (may take up to 10 minutes)</p>
+        }
         <textarea ref={crewOutputRef} value={logs} readOnly />
       </div>
     );

@@ -53,36 +53,35 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     }
     
     # reassign the path of the output files for each of the tasks
-    profile_task.output_file = 'data/' + session_id + '/output/candidate_profile.md'
-    research_task.output_file = 'data/' + session_id + '/output/job_requirements.md'
-    cover_letter_compose_task.output_file = 'data/' + session_id + '/output/cover_letter.md'
-    review_cover_letter_task.output_file = 'data/' + session_id + '/output/cover_letter_review.md'
-    check_consistency_task.output_file = 'data/' + session_id + '/output/consistency_report.md'
+    profile_task.output_file = 'data/' + session_id + '/output/candidate_profile.txt'
+    research_task.output_file = 'data/' + session_id + '/output/job_requirements.txt'
+    cover_letter_compose_task.output_file = 'data/' + session_id + '/output/cover_letter.txt'
+    review_cover_letter_task.output_file = 'data/' + session_id + '/output/cover_letter_review.txt'
+    check_consistency_task.output_file = 'data/' + session_id + '/output/consistency_report.txt'
     
     # Assemble the Crew
-    output_log_file = 'data/' + session_id + '/output/crew_log.txt'
     cover_letter_crew = Crew(
         agents=[
                 profiler,
                 job_researcher,
-                # cover_letter_writer,
-                # cover_letter_reviewer,
-                # qa_agent
+                cover_letter_writer,
+                cover_letter_reviewer,
+                qa_agent
                 ],
         tasks=[
                 profile_task,
                 research_task,
-                # cover_letter_compose_task,
-                # review_cover_letter_task,
-                # check_consistency_task
+                cover_letter_compose_task,
+                review_cover_letter_task,
+                check_consistency_task
             ],
-        # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
-        #                        temperature=0.7),
-        # process=Process.hierarchical,
-        process=Process.sequential,
+        manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
+                               temperature=0.7),
+        process=Process.hierarchical,
+        # process=Process.sequential,
         verbose=True,
         memory=False,
-        cache=False
+        cache=True
     )
     
     # Redirect stdout to the logger
