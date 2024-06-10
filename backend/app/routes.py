@@ -1,6 +1,5 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort, send_file
 import os
-import uuid
 
 bp = Blueprint('main', __name__)
 
@@ -79,6 +78,28 @@ def cancel_task(task_id):
     celery.control.revoke(task_id, terminate=True, signal='SIGKILL')
     
     return jsonify({'status': 'Task cancelled!'})
+
+@bp.route('/download/<session_id>/<file_name>', methods=['GET'])
+def download(session_id, file_name):
+    print("Download endpoint hit! Session ID: ", session_id, "File name: ", file_name)
+    
+    # Construct absolute path
+    directory = os.path.abspath(os.path.join('data', session_id, 'output'))
+    file_path = os.path.join(directory, file_name)
+    print("Absolute directory: ", directory)
+    print("Absolute file path: ", file_path)
+    
+    try:
+        if os.path.exists(file_path):
+            print("File found!")
+            return send_file(file_path, as_attachment=True)
+        else:
+            print("File not found!")
+            abort(404)
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        abort(500, description="Internal Server Error")
+
 
 # todo: This is a temporary route for testing without Celery. We will remove this later.
 @bp.route('/generate-cover-letter', methods=['POST'])

@@ -6,29 +6,26 @@ import './App.css';
 import io from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
-const OutputFiles = ({taskStatus}) => {
+
+const OutputFile = ({title, fileName, onClick}) => {
+  return (
+    <div>
+      {title}: <span style={{ color: 'blue', cursor: 'pointer' }} onClick={() => {onClick(fileName)}}>Download</span>
+    </div>
+  );
+}
+
+const OutputFiles = ({taskStatus, onClick}) => {
   if (taskStatus !== 'SUCCESS') {
     return <div></div>;
   } else {
     return (
       <div>
         <h2>Output Files</h2>
-        <div className="output-group">
-          <h3>Candidate Profile</h3>
-          <p>Download</p>
-        </div>
-        <div className="output-group">
-          <h3>Job Requirements</h3>
-          <p>Download</p>
-        </div>
-        <div className="output-group">
-          <h3>Cover Letter Review</h3>
-          <p>Download</p>
-        </div>
-        <div className="output-group">
-          <h3>Cover Letter</h3>
-          <p>Download</p>
-        </div>
+        <OutputFile title="Candidate Profile" fileName="candidate_profile.txt" onClick={onClick}/>
+        <OutputFile title="Job Requirements" fileName="job_requirements.txt" onClick={onClick}/>
+        <OutputFile title="Cover Letter Review" fileName="cover_letter_review.txt" onClick={onClick}/>
+        <OutputFile title="Cover Letter" fileName="cover_letter.txt" onClick={onClick}/>
       </div>
     );
   }
@@ -145,6 +142,20 @@ function App() {
     }
   };
 
+  const handleDownloadOutputFile = async (fileName) => {
+    try {
+      const response = await axios.get(`https://localhost:5001/download/${sessionId}/${fileName}`);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error('Error downloading output file:', error);
+    }
+  }
+
   const handleCancelExecution = async () => {
     if (taskId) {
       try {
@@ -200,7 +211,7 @@ function App() {
       </div>
       <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
       <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
-      <OutputFiles taskStatus={taskStatus} />
+      <OutputFiles taskStatus={taskStatus} onClick={handleDownloadOutputFile} />
       <button onClick={handleCancelExecution}>Cancel Execution</button>
     </div>
   );
