@@ -80,7 +80,7 @@ function App() {
 
   // Listen for crew execution logs
   useEffect(() => {
-    const socket = io('https://localhost:5001');  // Ensure this matches Flask-SocketIO setup
+    const socket = io('http://localhost:5001');  // Ensure this matches Flask-SocketIO setup
     socket.on('log', (data) => {
       setLogs((prevLogs) => prevLogs + '\n' + data.data);
     });
@@ -130,7 +130,7 @@ function App() {
 
     try {
       console.log("here")
-      const response = await axios.post('https://localhost:5001/generate-cover-letter-task', formData, {
+      const response = await axios.post('http://localhost:5001/generate-cover-letter-task', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-session-id': sessionId,
@@ -147,7 +147,7 @@ function App() {
 
   const handleDownloadOutputFile = async (fileName) => {
     try {
-      const response = await axios.get(`https://localhost:5001/download/${sessionId}/${fileName}`);
+      const response = await axios.get(`http://localhost:5001/download/${sessionId}/${fileName}`);
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -162,7 +162,7 @@ function App() {
   const handleCancelExecution = async () => {
     if (taskId) {
       try {
-        await axios.post(`https://localhost:5001/cancel-task/${taskId}`);
+        await axios.post(`http://localhost:5001/cancel-task/${taskId}`);
         setTaskId(null);
       } catch (error) {
         console.error('Error canceling execution:', error);
@@ -174,7 +174,7 @@ function App() {
     const fetchTaskStatus = async () => {
       if (taskId) {
         try {
-          const response = await axios.get(`https://localhost:5001/status/${taskId}`);
+          const response = await axios.get(`http://localhost:5001/status/${taskId}`);
           const {state, status, result } = response.data;
           console.log(status);
           setTaskStatus(state);
