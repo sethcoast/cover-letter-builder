@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
   
   if (mode === 'development') {
     serverConfig = {
+      plugins: [react()],
       https: {
         key: fs.readFileSync(path.resolve(process.env.SSL_KEY_FILE)),
         cert: fs.readFileSync(path.resolve(process.env.SSL_CRT_FILE)),
@@ -27,6 +28,7 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    plugins: [react()],
     // other Vite configurations
     server: serverConfig,
   };
