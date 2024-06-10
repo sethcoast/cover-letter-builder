@@ -84,7 +84,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         cache=True
     )
     
-    # Redirect stdout to the logger
+    # Redirect stdout to the logger 
     sys.stdout = LoggerWriter(logger, logging.INFO)
     sys.stderr = LoggerWriter(logger, logging.ERROR)
     
