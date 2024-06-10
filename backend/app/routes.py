@@ -21,7 +21,7 @@ def generate_cover_letter_task():
     # create data directory for the session (if they don't already exist)
     if not os.path.exists('data'):
         os.mkdir('data')
-    if not os.path.exists('data' + session_id):
+    if not os.path.exists('data/' + session_id):
         os.mkdir('data/' + session_id)
         os.mkdir('data/' + session_id + '/input')
         os.mkdir('data/' + session_id + '/output')
