@@ -1,12 +1,5 @@
 from crewai import Agent, Task
 from dotenv import load_dotenv
-from crewai_tools import (
-  ScrapeWebsiteTool,
-  DirectoryReadTool,
-  DirectorySearchTool,
-  PDFSearchTool,
-  SerperDevTool
-)
 import os
 
 
@@ -16,22 +9,11 @@ os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
 
-# Tool definitions
-search_tool = SerperDevTool()
-scrape_tool = ScrapeWebsiteTool()
-read_resume = DirectoryReadTool(file_path='./data')
-search_resume = DirectorySearchTool(file_path='./data')
-semantic_search_resume = PDFSearchTool()
-
 # Agent Definitions
 profiler = Agent(
     role="Personal Profiler for AI Engineers",
     goal="Do incredible research on AI/ML engineers "
          "to help them stand out in the job market",
-    tools = [scrape_tool,
-             read_resume,
-             search_resume,
-             semantic_search_resume],
     verbose=True,
     allow_delegation=True,
     backstory=(
@@ -61,7 +43,6 @@ job_researcher = Agent(
     role="Tech Job Researcher",
     goal="Make sure to do amazing analysis on "
          "job postings to help job applicants",
-    tools = [scrape_tool],
     verbose=True,
     allow_delegation=True,
     backstory=(
@@ -91,10 +72,6 @@ job_researcher = Agent(
 cover_letter_writer = Agent(
     role="Y-Combinator Cover Letter Writer for ML/AI Engineers",
     goal="Compose a cover letter for a Y-Combinator startup application",
-    tools = [scrape_tool,
-             read_resume,
-             search_resume,
-             semantic_search_resume],
     verbose=True,
     allow_delegation=True,
     backstory=(
@@ -110,7 +87,6 @@ cover_letter_writer = Agent(
 cover_letter_reviewer = Agent(
     role="Y-Combinator startup ML/AI Engineering hiring manager",
     goal="Review cover letters for Y-Combinator startup applications, compare them to job requirements, provide feedback to the cover letter writer",
-    tools = [scrape_tool],
     backstory=(
         "As a seasoned ML/AI Engineering Hiring Manager, you have dedicated your career to "
         "identifying and nurturing top talent in the tech industry. Your journey began at a "
@@ -152,10 +128,6 @@ qa_agent = Agent(
         "experiences, and qualifications effectively. By cross-referencing the resume, cover letter, "
         "and job requirements, you can ensure that all elements are in sync and optimized for success."
     ),
-    tools = [scrape_tool,
-             read_resume,
-             search_resume,
-             semantic_search_resume],
     verbose=True,
     allow_delegation=True
 )
@@ -260,7 +232,7 @@ review_cover_letter_task = Task(
         "specific suggestions for improvement. The report should include a clear assessment of how well "
         "the cover letter matches the job requirements and any additional advice for making the application stand out."
     ),
-    tools=[scrape_tool],
+    context=[research_task, profile_task, cover_letter_compose_task],
     agent=cover_letter_reviewer,
     async_execution=False,
 )
@@ -281,6 +253,7 @@ check_consistency_task = Task(
         "the cover letter is aligned with job requirements and canditate documents, and presents a cohesive narrative."
     ),
     agent=qa_agent,
+    context=[research_task, profile_task, cover_letter_compose_task],
     async_execution=False
 )
 

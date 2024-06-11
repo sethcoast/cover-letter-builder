@@ -3,6 +3,10 @@ from flask_cors import CORS
 from flask_socketio import SocketIO
 from celery import Celery
 from crewai import Crew, Process
+from crewai_tools import (
+  ScrapeWebsiteTool,
+  PDFSearchTool
+)
 from langchain_openai import ChatOpenAI
 from .config import Config
 from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
@@ -58,6 +62,18 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     cover_letter_compose_task.output_file = 'data/' + session_id + '/output/cover_letter.txt'
     review_cover_letter_task.output_file = 'data/' + session_id + '/output/cover_letter_review.txt'
     check_consistency_task.output_file = 'data/' + session_id + '/output/consistency_report.txt'
+    
+    # Tool definitions
+    scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
+    scrape_job_posting_tool = ScrapeWebsiteTool(website_url=job_url)
+    semantic_search_resume = PDFSearchTool(pdf=resume_file_path)
+    
+    # Add tools to the tasks
+    profile_task.tools = [scrape_linkedin_tool, semantic_search_resume]
+    research_task.tools = [scrape_job_posting_tool]
+    cover_letter_compose_task.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
+    review_cover_letter_task.tools = [scrape_job_posting_tool]
+    check_consistency_task.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
     
     # Assemble the Crew
     cover_letter_crew = Crew(

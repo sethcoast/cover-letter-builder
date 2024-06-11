@@ -10,3 +10,5 @@ node_modules
 dump.rdb
 .env
 .venv
+backend/notebooks/data
+backend/notebooks/crew_log.txt
