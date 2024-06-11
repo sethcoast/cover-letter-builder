@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, abort, send_file
+import redis
 import os
 
 bp = Blueprint('main', __name__)
@@ -100,6 +101,15 @@ def download(session_id, file_name):
         print(f"Error occurred: {e}")
         abort(500, description="Internal Server Error")
 
+# Test Redis connection
+@bp.route('/test_redis')
+def test_redis():
+    try:
+        r = redis.from_url(os.getenv('REDIS_URL'))
+        r.ping()
+        return jsonify({"status": "success", "message": "Connected to Redis successfully!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 # todo: This is a temporary route for testing without Celery. We will remove this later.
 @bp.route('/generate-cover-letter', methods=['POST'])
