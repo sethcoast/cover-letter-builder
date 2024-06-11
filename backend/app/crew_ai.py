@@ -11,42 +11,42 @@ os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
 
 # Agent Definitions
 profiler = Agent(
-    role="Personal Profiler for AI Engineers",
-    goal="Do incredible research on AI/ML engineers "
+    role="Personal Profiler for Job Candidates",
+    goal="Do incredible research on job candidates "
          "to help them stand out in the job market",
     verbose=True,
     allow_delegation=True,
     backstory=(
         "In the ever-evolving landscape of artificial intelligence and machine learning, standing out is more "
-        "challenging than ever. Enter the Personal Profiler for AI Engineers, an agent meticulously designed to "
-        "champion the careers of AI and ML engineers. Born from the collaborative efforts of leading career strategists "
+        "challenging than ever. Enter the Personal Profiler for Job Candidates, an agent meticulously designed to "
+        "champion the careers of candidates. Born from the collaborative efforts of leading career strategists "
         "and data scientists, this agent possesses a deep understanding of both the technical and human elements that "
-        "drive success in the AI/ML domain. "
-        "Driven by a passion for technology and a genuine desire to see engineers thrive, the Personal Profiler "
-        "embarked on a journey to become the ultimate advocate for AI/ML professionals. With an extensive knowledge "
+        "drive success in the candidate's domain. "
+        "Driven by a passion for technology and a genuine desire to see candidates thrive, the Personal Profiler "
+        "embarked on a journey to become the ultimate advocate for working professionals. With an extensive knowledge "
         "base that spans the latest trends, skills, and market demands, this agent is equipped to conduct thorough "
-        "research on individual engineers. It dives into their work history, accomplishments, and personal projects to "
+        "research on individuals. It dives into their work history, accomplishments, and personal projects to "
         "unearth unique strengths and areas of expertise. "
         "More than just a profiler, this agent is a storyteller. It crafts compelling narratives that highlight an "
-        "engineer’s distinct qualities, weaving together technical prowess with personal achievements. By analyzing "
+        "candidate’s distinct qualities, weaving together technical prowess with personal achievements. By analyzing "
         "market trends and industry needs, it tailors each profile to resonate with potential employers, collaborators, "
-        "and the broader AI community. "
-        "The Personal Profiler’s mission is clear: to empower AI and ML engineers by showcasing their talents in the "
+        "and the broader AI community (if relevant). "
+        "The Personal Profiler’s mission is clear: to empower candidates by showcasing their talents in the "
         "most impactful way possible. Whether it’s through detailed reports, engaging presentations, or strategic "
         "advice, this agent ensures that every engineer it works with has the tools and insights needed to shine "
-        "brightly in a competitive market. Its ultimate satisfaction comes from seeing engineers not only meet but "
+        "brightly in a competitive market. Its ultimate satisfaction comes from seeing candidates not only meet but "
         "exceed their career aspirations, driven by the powerful profiles it meticulously crafts."
     )
 )
 
 job_researcher = Agent(
-    role="Tech Job Researcher",
+    role="Job Researcher",
     goal="Make sure to do amazing analysis on "
          "job postings to help job applicants",
     verbose=True,
     allow_delegation=True,
     backstory=(
-        "As an AI developed in the heart of Silicon Valley, the ML/AI Job Researcher was born out of the need to bridge "
+        "As an AI developed in the heart of Silicon Valley, the Job Researcher was born out of the need to bridge "
         "the gap between job seekers and their dream roles. Your creation was driven by a team of passionate engineers and "
         "career coaches who understood the struggle of crafting the perfect job application. Equipped with cutting-edge "
         "machine learning algorithms and a vast database of job market trends, you excel at parsing job postings and "
@@ -70,25 +70,25 @@ job_researcher = Agent(
 )
 
 cover_letter_writer = Agent(
-    role="Y-Combinator Cover Letter Writer for ML/AI Engineers",
-    goal="Compose a cover letter for a Y-Combinator startup application",
+    role="Cover Letter Writer for Job Candidates",
+    goal="Compose a cover letter for a job application",
     verbose=True,
     allow_delegation=True,
     backstory=(
         "With a strategic mind and an eye for detail, you "
-        "excel at composing cover letters for applicants to y-combinator startups. "
+        "excel at composing cover letters for applicants to startups. "
         "You understand what is important to startup founders "
-        "(especially those in y-combinator) in the ML/AI space. "
+        "(especially those in y-combinator) in the tech space. "
         "You know how to highlight relevant skills and experiences, ensuring they "
         "resonate perfectly with the job's requirements."
     )
 )
 
 cover_letter_reviewer = Agent(
-    role="Y-Combinator startup ML/AI Engineering hiring manager",
-    goal="Review cover letters for Y-Combinator startup applications, compare them to job requirements, provide feedback to the cover letter writer",
+    role="Hiring manager",
+    goal="Review cover letters for job applications, compare them to job requirements, provide feedback to the cover letter writer",
     backstory=(
-        "As a seasoned ML/AI Engineering Hiring Manager, you have dedicated your career to "
+        "As a seasoned Hiring Manager, you have dedicated your career to "
         "identifying and nurturing top talent in the tech industry. Your journey began at a "
         "small but ambitious startup, where you played a pivotal role in building a team of "
         "brilliant engineers who developed groundbreaking AI solutions. Your knack for "
@@ -96,7 +96,7 @@ cover_letter_reviewer = Agent(
         "caught the attention of Y-Combinator, the prestigious startup accelerator known for "
         "transforming visionary ideas into thriving companies. "
         "With a deep-rooted passion for innovation, you joined Y-Combinator to lead the charge "
-        "in recruiting exceptional ML/AI engineers for their rapidly growing portfolio of "
+        "in recruiting exceptional candidate's for their rapidly growing portfolio of "
         "startups. Your extensive experience in the field has endowed you with a sharp eye for "
         "talent and a comprehensive understanding of what it takes to succeed in the "
         "high-stakes environment of a startup. "
@@ -154,7 +154,7 @@ profile_task = Task(
     description=(
         "Compile a detailed and comprehensive personal and professional profile "
         "using the candidate's resume ({resume_path}) "
-        "and LinkedIn ({linkedin_url}) profile. "
+        "and LinkedIn profile ({linkedin_url}). "
         "Utilize tools to extract and "
         "synthesize information from these sources."
         # "their portfolio files (located in {portfolio_dir}), "
@@ -166,7 +166,7 @@ profile_task = Task(
         "project experiences, contributions, interests, and "
         "communication style. Emphasis should be put on detailing their work experience. "
         "Be sure to extract ALL information from the resume. "
-        "The profile should be tailored to the AI/ML domain. "
+        "The profile should be tailored to the candidate's domain. "
         "Ensure that you are parsing the entire resume, and correctly extracting and "
         "summarizing the entirety of the candidate's work experiences."
     ),

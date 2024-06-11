@@ -69,11 +69,11 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     semantic_search_resume = PDFSearchTool(pdf=resume_file_path)
     
     # Add tools to the tasks
-    profile_task.tools = [scrape_linkedin_tool, semantic_search_resume]
-    research_task.tools = [scrape_job_posting_tool]
-    cover_letter_compose_task.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
-    review_cover_letter_task.tools = [scrape_job_posting_tool]
-    check_consistency_task.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
+    profiler.tools = [scrape_linkedin_tool, semantic_search_resume]
+    job_researcher.tools = [scrape_job_posting_tool]
+    cover_letter_writer.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
+    cover_letter_reviewer.tools = [scrape_job_posting_tool]
+    qa_agent.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
     
     # Assemble the Crew
     cover_letter_crew = Crew(
