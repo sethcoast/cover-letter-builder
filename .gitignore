@@ -9,3 +9,4 @@ backend/db
 node_modules
 dump.rdb
 .env
+.venv
