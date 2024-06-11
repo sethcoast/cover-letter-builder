@@ -37,7 +37,7 @@ const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
       <div className="output-group">
         {taskStatus === 'SUCCESS' ? 
         <p>Cover letter generated successfully!</p> : 
-        <p>Generating cover letter... (may take up to 10 minutes)</p>
+        <p>Generating cover letter... (may take several minutes)</p>
         }
         <textarea ref={crewOutputRef} value={logs} readOnly />
       </div>
@@ -63,7 +63,7 @@ function App() {
   const [taskStatus, setTaskStatus] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const crewOutputRef = useRef(null);
-  const [coverLetter, setCoverLetter] = useState('');
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Immediately start a session, the session ID is used to track the progress of the AI crew output
   useEffect(() => {
@@ -80,7 +80,7 @@ function App() {
 
   // Listen for crew execution logs
   useEffect(() => {
-    const socket = io('http://localhost:5001');  // Ensure this matches Flask-SocketIO setup
+    const socket = io(`${API_BASE_URL}`);  // Ensure this matches Flask-SocketIO setup
     socket.on('log', (data) => {
       setLogs((prevLogs) => prevLogs + '\n' + data.data);
     });
@@ -130,7 +130,7 @@ function App() {
 
     try {
       console.log("here")
-      const response = await axios.post('http://localhost:5001/generate-cover-letter-task', formData, {
+      const response = await axios.post(`${API_BASE_URL}/generate-cover-letter-task`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-session-id': sessionId,
@@ -147,7 +147,7 @@ function App() {
 
   const handleDownloadOutputFile = async (fileName) => {
     try {
-      const response = await axios.get(`http://localhost:5001/download/${sessionId}/${fileName}`);
+      const response = await axios.get(`${API_BASE_URL}/download/${sessionId}/${fileName}`);
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -162,7 +162,7 @@ function App() {
   const handleCancelExecution = async () => {
     if (taskId) {
       try {
-        await axios.post(`http://localhost:5001/cancel-task/${taskId}`);
+        await axios.post(`${API_BASE_URL}/cancel-task/${taskId}`);
         setTaskId(null);
       } catch (error) {
         console.error('Error canceling execution:', error);
@@ -174,7 +174,7 @@ function App() {
     const fetchTaskStatus = async () => {
       if (taskId) {
         try {
-          const response = await axios.get(`http://localhost:5001/status/${taskId}`);
+          const response = await axios.get(`${API_BASE_URL}/status/${taskId}`);
           const {state, status, result } = response.data;
           console.log(status);
           setTaskStatus(state);

@@ -12,3 +12,4 @@ dump.rdb
 .venv
 backend/notebooks/data
 backend/notebooks/crew_log.txt
+frontend/.env.*
