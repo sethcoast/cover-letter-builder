@@ -22,7 +22,7 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 app.config['SECRET_KEY'] = 'secret!'
 app.config['CELERY_BROKER_URL'] = Config.CELERY_BROKER_URL
 app.config['CELERY_RESULT_BACKEND'] = Config.CELERY_RESULT_BACKEND
-app.config.from_object("app.config.Config")
+app.config.from_object(Config)
 
 from .routes import bp
 app.register_blueprint(bp)
