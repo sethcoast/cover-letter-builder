@@ -15,24 +15,19 @@ import logging
 import ssl
 import sys
 import os
-# import eventlet
-
-# eventlet.monkey_patch()
 
 # Initialize the Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
-
-app.config['SECRET_KEY'] = 'secret!'
-app.config['CELERY_BROKER_URL'] = Config.CELERY_BROKER_URL
-app.config['CELERY_RESULT_BACKEND'] = Config.CELERY_RESULT_BACKEND
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173","https://cover-letter-builder-delta.vercel.app"]}})
 app.config.from_object(Config)
-
 from .routes import bp
 app.register_blueprint(bp)
 
 # Initialize the SocketIO app
-socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173", message_queue=Config.SOCKET_IO_MESSAGE_QUEUE, async_mode='threading')
+socketio = SocketIO(app,
+                    cors_allowed_origins=["http://localhost:5173","https://cover-letter-builder-delta.vercel.app"],
+                    message_queue=Config.SOCKET_IO_MESSAGE_QUEUE,
+                    async_mode='threading')
 
 # setup logger
 logger = setup_logger(socketio)
