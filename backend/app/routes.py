@@ -9,7 +9,7 @@ def hello():
 
 @bp.route('/generate-cover-letter-task', methods=['POST'])
 def generate_cover_letter_task():
-    from app.app import crew_write_cover_letter_task
+    from .app import crew_write_cover_letter_task
     session_id = request.headers.get('x-session-id')
     job_url = request.form['jobUrl']
     linkedin_url = request.form['linkedinUrl']

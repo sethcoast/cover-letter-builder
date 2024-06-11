@@ -4,9 +4,9 @@ from flask_socketio import SocketIO
 from celery import Celery
 from crewai import Crew, Process
 from langchain_openai import ChatOpenAI
-from app.config import Config
-from app.crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
-from app.logger import setup_logger
+from .config import Config
+from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
+from .logger import setup_logger
 import logging
 import ssl
 import sys
@@ -24,7 +24,7 @@ app.config['CELERY_BROKER_URL'] = Config.CELERY_BROKER_URL
 app.config['CELERY_RESULT_BACKEND'] = Config.CELERY_RESULT_BACKEND
 app.config.from_object("app.config.Config")
 
-from app.routes import bp
+from .routes import bp
 app.register_blueprint(bp)
 
 # Initialize the SocketIO app
