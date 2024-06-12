@@ -26,3 +26,26 @@ if not hasattr(select, 'epoll'):
 
 # Make sure eventlet patches everything necessary
 eventlet.monkey_patch(os=False, select=True)
+
+# Add missing methods to GreenSocket
+import eventlet.green.socket as green_socket
+
+if not hasattr(green_socket.GreenSocket, 'sendmsg'):
+    def sendmsg(self, *args, **kwargs):
+        raise NotImplementedError("sendmsg is not supported by eventlet's GreenSocket")
+    green_socket.GreenSocket.sendmsg = sendmsg
+
+if not hasattr(green_socket.GreenSocket, 'recvmsg'):
+    def recvmsg(self, *args, **kwargs):
+        raise NotImplementedError("recvmsg is not supported by eventlet's GreenSocket")
+    green_socket.GreenSocket.recvmsg = recvmsg
+
+if not hasattr(green_socket.GreenSocket, 'recvmmsg'):
+    def recvmmsg(self, *args, **kwargs):
+        raise NotImplementedError("recvmmsg is not supported by eventlet's GreenSocket")
+    green_socket.GreenSocket.recvmmsg = recvmmsg
+
+if not hasattr(green_socket.GreenSocket, 'sendmmsg'):
+    def sendmmsg(self, *args, **kwargs):
+        raise NotImplementedError("sendmmsg is not supported by eventlet's GreenSocket")
+    green_socket.GreenSocket.sendmmsg = sendmmsg
