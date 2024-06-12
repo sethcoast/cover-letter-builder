@@ -20,7 +20,12 @@ import os
 
 # Initialize the Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["http://localhost:5173","https://cover-letter-builder-delta.vercel.app"]}})
+origins = [
+    "http://localhost:5173",
+    "https://cover-letter-builder-delta.vercel.app",
+    "https://cover-letter-builder-7s8ug2yp6-seth-donaldsons-projects.vercel.app"
+]
+CORS(app, resources={r"/*": {"origins": origins}})
 app.config.from_object(Config)
 
 # Configure session to use Redis
