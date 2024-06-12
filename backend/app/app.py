@@ -30,7 +30,7 @@ app.config.from_object(Config)
 
 # Configure session to use Redis
 app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = redis.from_url(Config.REDIS_URL)
+app.config['SESSION_REDIS'] = redis.from_url(os.getenv('REDIS_URL'))
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 Session(app)
