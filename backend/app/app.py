@@ -23,7 +23,7 @@ app = Flask(__name__)
 origins = [
     "http://localhost:5173",
     "https://cover-letter-builder-delta.vercel.app",
-    "https://cover-letter-builder-*.vercel.app"
+    "https://*.vercel.app"
 ]
 CORS(app, resources={r"/*": {"origins": origins}})
 app.config.from_object(Config)
