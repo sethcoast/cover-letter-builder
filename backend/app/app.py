@@ -41,7 +41,7 @@ app.register_blueprint(bp)
 # Initialize the SocketIO app
 socketio = SocketIO(app,
                     cors_allowed_origins=["http://localhost:5173","https://cover-letter-builder-delta.vercel.app"],
-                    message_queue=Config.REDIS_URL,
+                    message_queue=os.getenv('REDIS_URL'),
                     async_mode='threading')
 
 # setup logger
