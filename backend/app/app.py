@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from flask_session import Session
 from celery import Celery
 from crewai import Crew, Process
 from crewai_tools import (
@@ -11,6 +12,7 @@ from langchain_openai import ChatOpenAI
 from .config import Config
 from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
 from .logger import setup_logger
+import redis
 import logging
 import ssl
 import sys
@@ -20,6 +22,14 @@ import os
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ["http://localhost:5173","https://cover-letter-builder-delta.vercel.app"]}})
 app.config.from_object(Config)
+
+# Configure session to use Redis
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = redis.from_url(Config.REDIS_URL)
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+Session(app)
+
 from .routes import bp
 app.register_blueprint(bp)
 

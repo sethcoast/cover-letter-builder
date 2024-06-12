@@ -215,7 +215,7 @@ function App() {
       <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
       <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
       <OutputFiles taskStatus={taskStatus} onClick={handleDownloadOutputFile} />
-      {/* <button onClick={handleCancelExecution}>Cancel Execution</button> */}
+      <button onClick={handleCancelExecution}>Cancel Execution</button>
     </div>
   );
 }
