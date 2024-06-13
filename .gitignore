@@ -1,4 +1,5 @@
 backend/.env
+venv/
 backend/data
 backend/notebooks/db
 resume-builder.code-workspace
