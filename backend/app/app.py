@@ -146,4 +146,4 @@ class LoggerWriter:
 
 if __name__ == '__main__':
     print("Running app...")
-    socketio.run(app, debug=True, port='5001')
+    socketio.run(app, host='0.0.0.0', debug=True, port='5001')
