@@ -1,8 +1,10 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA', './backend/app']
+
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA']
+
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args:
@@ -12,6 +14,7 @@ steps:
       OPENAI_API_KEY=$(gcloud secrets versions access latest --secret="OPENAI_API_KEY")
       SERPER_API_KEY=$(gcloud secrets versions access latest --secret="SERPER_API_KEY")
       REDIS_URL=$(gcloud secrets versions access latest --secret="REDIS_URL")
+
       # Deploy to Cloud Run
       gcloud run deploy cover-letter-backend \
         --image gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA \
@@ -23,6 +26,7 @@ steps:
         --set-env-vars CELERY_BROKER_URL=$REDIS_URL \
         --set-env-vars CELERY_RESULT_BACKEND=$REDIS_URL \
         --set-env-vars REDIS_URL=$REDIS_URL
+
 images:
 - 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA'
 
