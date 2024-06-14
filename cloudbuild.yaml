@@ -21,11 +21,11 @@ steps:
         --platform managed \
         --region us-central1 \
         --allow-unauthenticated \
-        --set-env-vars OPENAI_API_KEY=$OPENAI_API_KEY \
-        --set-env-vars SERPER_API_KEY=$SERPER_API_KEY \
-        --set-env-vars CELERY_BROKER_URL=$REDIS_URL \
-        --set-env-vars CELERY_RESULT_BACKEND=$REDIS_URL \
-        --set-env-vars REDIS_URL=$REDIS_URL
+        --set-env-vars OPENAI_API_KEY=${OPENAI_API_KEY} \
+        --set-env-vars SERPER_API_KEY=${SERPER_API_KEY} \
+        --set-env-vars CELERY_BROKER_URL=${REDIS_URL} \
+        --set-env-vars CELERY_RESULT_BACKEND=${REDIS_URL} \
+        --set-env-vars REDIS_URL=${REDIS_URL}
 
 images:
 - 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA'
