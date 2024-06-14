@@ -1,0 +1,29 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA', './backend/app']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA']
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      # Fetch secrets from Secret Manager
+      OPENAI_API_KEY=$(gcloud secrets versions access latest --secret="OPENAI_API_KEY")
+      SERPER_API_KEY=$(gcloud secrets versions access latest --secret="SERPER_API_KEY")
+      CELERY_BROKER_URL=$(gcloud secrets versions access latest --secret="CELERY_BROKER_URL")
+      CELERY_RESULT_BACKEND=$(gcloud secrets versions access latest --secret="CELERY_RESULT_BACKEND")
+      REDIS_URL=$(gcloud secrets versions access latest --secret="REDIS_URL")
+      # Deploy to Cloud Run
+      gcloud run deploy cover-letter-backend \
+        --image gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA \
+        --platform managed \
+        --region us-central1 \
+        --allow-unauthenticated \
+        --set-env-vars OPENAI_API_KEY=$OPENAI_API_KEY \
+        --set-env-vars SERPER_API_KEY=$SERPER_API_KEY \
+        --set-env-vars CELERY_BROKER_URL=$CELERY_BROKER_URL \
+        --set-env-vars CELERY_RESULT_BACKEND=$CELERY_RESULT_BACKEND \
+        --set-env-vars REDIS_URL=$REDIS_URL
+images:
+- 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA'
