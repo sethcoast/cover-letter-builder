@@ -6,6 +6,7 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA']
 
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
   args: [
     'run', 'deploy', 'cover-letter-backend',
     '--image', 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA',
