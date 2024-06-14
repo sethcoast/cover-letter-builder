@@ -5,15 +5,15 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/cover-letter-backend-image:$COMMIT_SHA']
 
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+- name: 'ubuntu'
   entrypoint: 'bash'
   args:
     - '-c'
     - |
       # Fetch secrets from Secret Manager
-      OPENAI_API_KEY=$(gcloud secrets versions access latest --secret="OPENAI_API_KEY")
-      SERPER_API_KEY=$(gcloud secrets versions access latest --secret="SERPER_API_KEY")
-      REDIS_URL=$(gcloud secrets versions access latest --secret="REDIS_URL")
+      export OPENAI_API_KEY=$(gcloud secrets versions access latest --secret="OPENAI_API_KEY")
+      export SERPER_API_KEY=$(gcloud secrets versions access latest --secret="SERPER_API_KEY")
+      export REDIS_URL=$(gcloud secrets versions access latest --secret="REDIS_URL")
 
       # Deploy to Cloud Run
       gcloud run deploy cover-letter-backend \
