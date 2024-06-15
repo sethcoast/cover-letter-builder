@@ -35,7 +35,8 @@ def generate_cover_letter_task():
     # Here you would include your agent definitions and processing logic
     task = crew_write_cover_letter_task.apply_async(args=[job_url, linkedin_url,
                                                         #   resume_file_path, 
-                                                          session_id])
+                                                        #   session_id
+                                                          ])
 
     return jsonify({'task_id': task.id})
 

@@ -61,7 +61,8 @@ celery = make_celery(app)
 @celery.task(bind=True)
 def crew_write_cover_letter_task(self, job_url, linkedin_url,
                                 #  resume_file_path, 
-                                 session_id):
+                                #  session_id
+                                 ):
     cover_letter_inputs = {
         'job_posting_url': job_url,
         'resume_path':  "/",# resume_file_path,
