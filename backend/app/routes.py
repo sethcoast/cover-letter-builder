@@ -27,13 +27,15 @@ def generate_cover_letter_task():
         os.mkdir('data/' + session_id + '/input')
         os.mkdir('data/' + session_id + '/output')
     # save resume file to local directory (if it doesn't already exist)
-    resume_file_path = os.path.join('data/' + session_id + '/input', resume_file.filename)
-    print('resume file path: ', resume_file_path)
-    if not os.path.exists(resume_file_path):
-        resume_file.save(resume_file_path)
+    # resume_file_path = os.path.join('data/' + session_id + '/input', resume_file.filename)
+    # print('resume file path: ', resume_file_path)
+    # if not os.path.exists(resume_file_path):
+    #     resume_file.save(resume_file_path)
 
     # Here you would include your agent definitions and processing logic
-    task = crew_write_cover_letter_task.apply_async(args=[job_url, linkedin_url, resume_file_path, session_id])
+    task = crew_write_cover_letter_task.apply_async(args=[job_url, linkedin_url,
+                                                        #   resume_file_path, 
+                                                          session_id])
 
     return jsonify({'task_id': task.id})
 
@@ -112,22 +114,22 @@ def test_redis():
         return jsonify({"status": "error", "message": str(e)})
 
 # todo: This is a temporary route for testing without Celery. We will remove this later.
-@bp.route('/generate-cover-letter', methods=['POST'])
-def generate_cover_letter():
-    from .crew_ai import crew_write_cover_letter
-    job_url = request.form['jobUrl']
-    linkedin_url = request.form['linkedinUrl']
-    resume_file = request.files['resumeFile']
+# @bp.route('/generate-cover-letter', methods=['POST'])
+# def generate_cover_letter():
+#     # from .crew_ai import crew_write_cover_letter
+#     job_url = request.form['jobUrl']
+#     linkedin_url = request.form['linkedinUrl']
+#     resume_file = request.files['resumeFile']
     
-    print(job_url)
-    print(linkedin_url)
-    print(resume_file)
-    # todo: Actually this might not work. We might need to save it to redis or something
-    # save resume file to local directory
-    resume_file_path = os.path.join('data/input', resume_file.filename)
-    resume_file.save(resume_file_path)
+#     print(job_url)
+#     print(linkedin_url)
+#     print(resume_file)
+#     # todo: Actually this might not work. We might need to save it to redis or something
+#     # save resume file to local directory
+#     resume_file_path = os.path.join('data/input', resume_file.filename)
+#     resume_file.save(resume_file_path)
 
-    # Here you would include your agent definitions and processing logic
-    cover_letter = crew_write_cover_letter(job_url, linkedin_url, resume_file_path)
+#     # Here you would include your agent definitions and processing logic
+#     # cover_letter = crew_write_cover_letter(job_url, linkedin_url, resume_file_path)
 
-    return jsonify({'coverLetter': cover_letter})
+#     return jsonify({'coverLetter': cover_letter})
