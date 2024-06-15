@@ -62,16 +62,16 @@ celery = make_celery(app)
 def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, session_id):
     cover_letter_inputs = {
         'job_posting_url': job_url,
-        'resume_path': resume_file_path,
+        'resume_path':  "/",# resume_file_path,
         'linkedin_url': linkedin_url,
     }
     
     # reassign the path of the output files for each of the tasks
-    profile_task.output_file = 'data/' + session_id + '/output/candidate_profile.txt'
-    research_task.output_file = 'data/' + session_id + '/output/job_requirements.txt'
-    cover_letter_compose_task.output_file = 'data/' + session_id + '/output/cover_letter.txt'
-    review_cover_letter_task.output_file = 'data/' + session_id + '/output/cover_letter_review.txt'
-    check_consistency_task.output_file = 'data/' + session_id + '/output/consistency_report.txt'
+    # profile_task.output_file = 'data/' + session_id + '/output/candidate_profile.txt'
+    # research_task.output_file = 'data/' + session_id + '/output/job_requirements.txt'
+    # cover_letter_compose_task.output_file = 'data/' + session_id + '/output/cover_letter.txt'
+    # review_cover_letter_task.output_file = 'data/' + session_id + '/output/cover_letter_review.txt'
+    # check_consistency_task.output_file = 'data/' + session_id + '/output/consistency_report.txt'
     
     # Tool definitions
     scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
