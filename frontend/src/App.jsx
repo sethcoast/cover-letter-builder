@@ -82,7 +82,9 @@ function App() {
   useEffect(() => {
     const socket = io(`${API_BASE_URL}`);  // Ensure this matches Flask-SocketIO setup
     socket.on('log', (data) => {
-      setLogs((prevLogs) => prevLogs + '\n' + data.data);
+      // console.log('Received log:', data.data);
+      // setLogs((prevLogs) => prevLogs + '\n' + data.data);
+      setLogs(data.data);
     });
 
     return () => {

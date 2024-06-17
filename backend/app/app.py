@@ -9,6 +9,8 @@ from crewai_tools import (
   PDFSearchTool
 )
 from langchain_openai import ChatOpenAI
+from watchdog.observers.polling import PollingObserver as Observer
+from watchdog.events import FileSystemEventHandler, FileModifiedEvent
 from .config import Config
 from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
 from .logger import setup_logger
@@ -44,9 +46,6 @@ socketio = SocketIO(app,
                     cors_allowed_origins=["http://localhost:5173","https://cover-letter-builder-delta.vercel.app"],
                     message_queue=os.getenv('REDIS_URL'),
                     async_mode='threading')
-
-# setup logger
-logger = setup_logger(socketio)
 
 # Initialize the Celery app
 def make_celery(app):
@@ -93,6 +92,15 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     cover_letter_reviewer.tools = [scrape_job_posting_tool]
     qa_agent.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
     
+    # set up observer to watch for file changes
+    crew_log_file = f'data/{session_id}/crew_log.txt'
+    with open(crew_log_file, 'w'):
+        pass # Open in write mode, will truncate the file if it already exists
+    event_handler = FileChangeHandler()
+    observer = Observer()
+    observer.schedule(event_handler, path=crew_log_file, recursive=False)
+    observer.start()
+    
     # Assemble the Crew
     cover_letter_crew = Crew(
         agents=[
@@ -116,51 +124,59 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         verbose=True,
         memory=False,
         cache=True,
-        output_log_file='data/' + session_id + '/crew_log.txt'
+        output_log_file=crew_log_file
     )
     
     # Redirect stdout to the logger
-    sys.stdout = LoggerWriter(logger, logging.INFO)
-    sys.stderr = LoggerWriter(logger, logging.ERROR)
+    # sys.stdout = LoggerWriter(logger, logging.INFO)
+    # sys.stderr = LoggerWriter(logger, logging.ERROR)
     
-    try:
-        logger.info('Crew AI is running...')
-        
-        ### this execution will take a few minutes to run
-        result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
-        
-        # write output files to gcs bucket
-        bucket_dir = 'data/' + session_id
-        upload_to_gcs('cover-letter-bucket', bucket_dir + '/candidate_profile.txt', bucket_dir + '/candidate_profile.txt')
-        upload_to_gcs('cover-letter-bucket', bucket_dir + '/job_requirements.txt', bucket_dir + '/job_requirements.txt')
-        upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter.txt', bucket_dir + '/cover_letter.txt')
-        upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter_review.txt', bucket_dir + '/cover_letter_review.txt')
-        upload_to_gcs('cover-letter-bucket', bucket_dir + '/consistency_report.txt', bucket_dir + '/consistency_report.txt')
-        
-        self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
-        return {'status': 'Task completed!', 'result': result}
-    except Exception as e:
-        logger.error(f'Task failed: {str(e)}')
-        self.update_state(state='FAILURE', meta={'exc_type': type(e).__name__, 'exc_message': str(e)})
-        raise e
-    finally:
-        # Reset stdout and stderr
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
+    # try:
+    # logger.info('Crew AI is running...')
+    
+    ### this execution will take a few minutes to run
+    result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
+    
+    # write output files to gcs bucket
+    bucket_dir = 'data/' + session_id
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/candidate_profile.txt', bucket_dir + '/candidate_profile.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/job_requirements.txt', bucket_dir + '/job_requirements.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter.txt', bucket_dir + '/cover_letter.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter_review.txt', bucket_dir + '/cover_letter_review.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/consistency_report.txt', bucket_dir + '/consistency_report.txt')
+    
+    self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
+    return {'status': 'Task completed!', 'result': result}
+    # except Exception as e:
+    #     logger.error(f'Task failed: {str(e)}')
+    #     self.update_state(state='FAILURE', meta={'exc_type': type(e).__name__, 'exc_message': str(e)})
+    #     raise e
+    # finally:
+    #     # Reset stdout and stderr
+    #     sys.stdout = sys.__stdout__
+    #     sys.stderr = sys.__stderr__
 
 # Custom class to redirect stdout and stderr to the logger
-class LoggerWriter:
-    def __init__(self, logger, level):
-        self.logger = logger
-        self.level = level
+# class LoggerWriter:
+#     def __init__(self, logger, level):
+#         self.logger = logger
+#         self.level = level
 
-    def write(self, message):
-        if message.strip() != "":
-            self.logger.log(self.level, message)
+#     def write(self, message):
+#         if message.strip() != "":
+#             self.logger.log(self.level, message)
 
-    def flush(self):
-        pass
+#     def flush(self):
+#         pass
+    
+class FileChangeHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        if isinstance(event, FileModifiedEvent):
+            with open(event.src_path, 'r') as f:
+                content = f.read()
+                socketio.emit('log', {'data': content}, namespace='/')
 
 if __name__ == '__main__':
     print("Running app...")
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')  # Basic config
     socketio.run(app, host='0.0.0.0', debug=True, port='8080')
