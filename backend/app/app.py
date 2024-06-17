@@ -13,7 +13,6 @@ from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler, FileModifiedEvent
 from .config import Config
 from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
-from .logger import setup_logger
 from .gcs import download_from_gcs, upload_to_gcs
 import redis
 import logging
@@ -147,27 +146,6 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     
     self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
     return {'status': 'Task completed!', 'result': result}
-    # except Exception as e:
-    #     logger.error(f'Task failed: {str(e)}')
-    #     self.update_state(state='FAILURE', meta={'exc_type': type(e).__name__, 'exc_message': str(e)})
-    #     raise e
-    # finally:
-    #     # Reset stdout and stderr
-    #     sys.stdout = sys.__stdout__
-    #     sys.stderr = sys.__stderr__
-
-# Custom class to redirect stdout and stderr to the logger
-# class LoggerWriter:
-#     def __init__(self, logger, level):
-#         self.logger = logger
-#         self.level = level
-
-#     def write(self, message):
-#         if message.strip() != "":
-#             self.logger.log(self.level, message)
-
-#     def flush(self):
-#         pass
     
 class FileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
