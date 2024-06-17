@@ -12,6 +12,7 @@ from langchain_openai import ChatOpenAI
 from .config import Config
 from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
 from .logger import setup_logger
+from .gcs import download_from_gcs, upload_to_gcs
 import redis
 import logging
 import ssl
@@ -62,22 +63,27 @@ celery = make_celery(app)
 def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, session_id):
     cover_letter_inputs = {
         'job_posting_url': job_url,
-        'resume_path':  "/cover-letter-builder/backend/app/app.py",# resume_file_path,
+        'resume_path': resume_file_path,
         'linkedin_url': linkedin_url,
     }
     
+    # create temporary directory for storing output files from the Crew AI
+    os.makedirs('data/' + session_id, exist_ok=True)
+    # load resume file from GCS into local directory
+    download_from_gcs('cover-letter-builder', resume_file_path, resume_file_path)
+    
+    
     # reassign the path of the output files for each of the tasks
-    # profile_task.output_file = 'data/' + session_id + '/output/candidate_profile.txt'
-    # research_task.output_file = 'data/' + session_id + '/output/job_requirements.txt'
-    # cover_letter_compose_task.output_file = 'data/' + session_id + '/output/cover_letter.txt'
-    # review_cover_letter_task.output_file = 'data/' + session_id + '/output/cover_letter_review.txt'
-    # check_consistency_task.output_file = 'data/' + session_id + '/output/consistency_report.txt'
+    profile_task.output_file = 'data/' + session_id + '/candidate_profile.txt'
+    research_task.output_file = 'data/' + session_id + '/job_requirements.txt'
+    cover_letter_compose_task.output_file = 'data/' + session_id + '/cover_letter.txt'
+    review_cover_letter_task.output_file = 'data/' + session_id + '/cover_letter_review.txt'
+    check_consistency_task.output_file = 'data/' + session_id + '/consistency_report.txt'
     
     # Tool definitions
     scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
     scrape_job_posting_tool = ScrapeWebsiteTool(website_url=job_url)
-    semantic_search_resume = PDFSearchTool()
-        # pdf=resume_file_path)
+    semantic_search_resume = PDFSearchTool(pdf=resume_file_path)
     
     # Add tools to the tasks
     profiler.tools = [scrape_linkedin_tool, semantic_search_resume]
@@ -122,6 +128,10 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         ### this execution will take a few minutes to run
         result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
         self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
+        
+        
+        # write output files to gcs bucket
+        
         return {'status': 'Task completed!', 'result': result}
     except Exception as e:
         logger.error(f'Task failed: {str(e)}')

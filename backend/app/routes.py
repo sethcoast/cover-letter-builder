@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, abort, send_file
+from .gcs import upload_to_gcs
 import redis
 import os
 
@@ -19,23 +20,25 @@ def generate_cover_letter_task():
     print(job_url)
     print(linkedin_url)
     print(resume_file)
+    
+    # upload resume file to GCS so that celery worker can access it
+    resume_file_path = 'data/' + session_id + '/' + resume_file.filename
+    upload_to_gcs("cover-letter-bucket", resume_file, resume_file_path)
     # create data directory for the session (if they don't already exist)
-    if not os.path.exists('data'):
-        os.mkdir('data')
-    if not os.path.exists('data/' + session_id):
-        os.mkdir('data/' + session_id)
-        os.mkdir('data/' + session_id + '/input')
-        os.mkdir('data/' + session_id + '/output')
-    # save resume file to local directory (if it doesn't already exist)
+    # if not os.path.exists('data'):
+    #     os.mkdir('data')
+    # if not os.path.exists('data/' + session_id):
+    #     os.mkdir('data/' + session_id)
+    #     os.mkdir('data/' + session_id + '/input')
+    #     os.mkdir('data/' + session_id + '/output')
+    # # save resume file to local directory (if it doesn't already exist)
     # resume_file_path = os.path.join('data/' + session_id + '/input', resume_file.filename)
     # print('resume file path: ', resume_file_path)
     # if not os.path.exists(resume_file_path):
     #     resume_file.save(resume_file_path)
 
     # Here you would include your agent definitions and processing logic
-    task = crew_write_cover_letter_task.apply_async(args=[job_url, linkedin_url,"",""])
-                                                        #   resume_file_path, session_id
-                                                        #   ])
+    task = crew_write_cover_letter_task.apply_async(args=[job_url, linkedin_url, resume_file_path, session_id])
 
     return jsonify({'task_id': task.id})
 
