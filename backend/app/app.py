@@ -61,6 +61,7 @@ celery = make_celery(app)
 
 @celery.task(bind=True)
 def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, session_id):
+    self.update_state(state='PROGRESS', meta={'status': 'Crew AI is running...'})
     cover_letter_inputs = {
         'job_posting_url': job_url,
         'resume_path': resume_file_path,
@@ -70,7 +71,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     # create temporary directory for storing output files from the Crew AI
     os.makedirs('data/' + session_id, exist_ok=True)
     # load resume file from GCS into local directory
-    download_from_gcs('cover-letter-builder', resume_file_path, resume_file_path)
+    download_from_gcs('cover-letter-bucket', resume_file_path, resume_file_path)
     
     
     # reassign the path of the output files for each of the tasks
@@ -114,7 +115,8 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         # process=Process.sequential,
         verbose=True,
         memory=False,
-        cache=True
+        cache=True,
+        output_log_file='data/' + session_id + '/crew_log.txt'
     )
     
     # Redirect stdout to the logger
@@ -123,15 +125,19 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     
     try:
         logger.info('Crew AI is running...')
-        self.update_state(state='PROGRESS', meta={'status': 'Crew AI is running...'})
         
         ### this execution will take a few minutes to run
         result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
-        self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
-        
         
         # write output files to gcs bucket
+        bucket_dir = 'data/' + session_id
+        upload_to_gcs('cover-letter-bucket', bucket_dir + '/candidate_profile.txt', bucket_dir + '/candidate_profile.txt')
+        upload_to_gcs('cover-letter-bucket', bucket_dir + '/job_requirements.txt', bucket_dir + '/job_requirements.txt')
+        upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter.txt', bucket_dir + '/cover_letter.txt')
+        upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter_review.txt', bucket_dir + '/cover_letter_review.txt')
+        upload_to_gcs('cover-letter-bucket', bucket_dir + '/consistency_report.txt', bucket_dir + '/consistency_report.txt')
         
+        self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
         return {'status': 'Task completed!', 'result': result}
     except Exception as e:
         logger.error(f'Task failed: {str(e)}')

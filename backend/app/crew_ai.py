@@ -133,21 +133,6 @@ qa_agent = Agent(
 )
 
 
-# def assemble_and_kickoff_crew(cover_letter_inputs, session_id):
-#     cover_letter_inputs = {
-#         'job_posting_url': job_url,
-#         'resume_path': resume_file_path,
-#         'linkedin_url': linkedin_url,
-#     }
-    
-#     ### this execution will take a few minutes to run
-#     print("Crew AI is running...")
-#     result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
-    
-#     cover_letter = "computation complete"
-#     return cover_letter
-
-
 # Task Definitions
 # Task for Profiler Agent: Compile Comprehensive Profile
 profile_task = Task(
@@ -170,7 +155,8 @@ profile_task = Task(
         "Ensure that you are parsing the entire resume, and correctly extracting and "
         "summarizing the entirety of the candidate's work experiences."
     ),
-    agent=profiler
+    agent=profiler,
+    # async_execution=True
 )
 
 # Task for Researcher Agent: Extract Job Requirements
@@ -186,7 +172,8 @@ research_task = Task(
         "skills, qualifications, and experiences, as well as preferred "
         "skills qualifications and experiences."
     ),
-    agent=job_researcher
+    agent=job_researcher,
+    # async_execution=True
 )
 
 # Task for Cover letter writer Agent: compose cover letter
@@ -220,7 +207,7 @@ cover_letter_compose_task = Task(
 # Task for Cover letter reviewer Agent: Review cover letter
 review_cover_letter_task = Task(
     description=(
-        "Review cover letters for Y-Combinator startup applications. "
+        "Review cover letters for job applications. "
         "Compare them to the provided job requirements at ({job_posting_url}) and give detailed feedback to the cover letter writer. "
         "Focus on how well the candidate's skills and experiences match the job requirements. "
         "Provide suggestions for improving the cover letter to better align with the job description. "
@@ -256,44 +243,3 @@ check_consistency_task = Task(
     context=[research_task, profile_task, cover_letter_compose_task],
     async_execution=False
 )
-
-# # Assemble the Crew
-# cover_letter_crew = Crew(
-#     agents=[
-#             profiler,
-#             # job_researcher,
-#             # cover_letter_writer,
-#             # cover_letter_reviewer,
-#             # qa_agent
-#             ],
-
-#     tasks=[
-#             profile_task,
-#             # research_task,
-#             # cover_letter_compose_task,
-#             # review_cover_letter_task,
-#             # check_consistency_task
-#            ],
-#     # manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
-#     #                        temperature=0.7),
-#     # process=Process.hierarchical,
-#     process=Process.sequential,
-#     # verbose=True
-#     memory=True,
-#     cache=True,
-#     output_log_file='data/output/crew_log.txt', # todo: figure out how to subscribe to this, also, will it be unique for each user?
-# )
-
-# def crew_write_cover_letter(job_url, linkedin_url, resume_file_path):    
-#     cover_letter_inputs = {
-#         'job_posting_url': job_url,
-#         'resume_path': resume_file_path,
-#         'linkedin_url': linkedin_url,
-#     }
-    
-#     ### this execution will take a few minutes to run
-#     print("Crew AI is running...")
-#     result = cover_letter_crew.kickoff(inputs=cover_letter_inputs)
-    
-#     cover_letter = "computation complete"
-#     return cover_letter
