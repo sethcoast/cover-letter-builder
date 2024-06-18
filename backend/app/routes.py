@@ -81,15 +81,17 @@ def download(session_id, file_name):
     directory = 'data/' + session_id
     # Create directory if it doesn't exist
     os.makedirs(directory, exist_ok=True)
-    file_path = f"{directory}/{file_name}"
+    gcs_file_path = f"{directory}/{file_name}"
+    local_file_path = os.path.abspath(os.path.join(directory, file_name))
     print(directory)
-    download_from_gcs("cover-letter-bucket", file_path, file_path)
+    print(local_file_path)
+    download_from_gcs("cover-letter-bucket", gcs_file_path, local_file_path)
     
     try:
-        if os.path.exists(file_path):
+        if os.path.exists(local_file_path):
             print("File found!")
-            print(file_path)
-            return send_file("../../" + file_path, as_attachment=True)
+            print(local_file_path)
+            return send_file(local_file_path, as_attachment=True)
         else:
             print("File not found!")
             abort(404)
