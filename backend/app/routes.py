@@ -79,6 +79,8 @@ def download(session_id, file_name):
     
     # Construct absolute path
     directory = 'data/' + session_id
+    # Create directory if it doesn't exist
+    os.makedirs(directory, exist_ok=True)
     file_path = f"{directory}/{file_name}"
     print(directory)
     download_from_gcs("cover-letter-bucket", file_path, file_path)
