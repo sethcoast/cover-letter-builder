@@ -1,10 +1,12 @@
 # AI-Powered Cover Letter Generator
 
+**Live Demo:** https://cover-letter-builder-delta.vercel.app/
+
 ![Screenshot of the Cover Letter Generator App](images/app-screenshot.png)
 
 This React web app leverages a team of AI agents to craft personalized cover letters, demonstrating my expertise in AI development and natural language processing. It's designed to showcase my AI engineering skills and look cute in my portfolio (see note below).
 
-**Live Demo:** https://cover-letter-builder-delta.vercel.app/
+**Live Demo (again):** https://cover-letter-builder-delta.vercel.app/
 
 NOTE:
 
