@@ -80,7 +80,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     check_consistency_task.output_file = 'data/' + session_id + '/consistency_report.txt'
     
     # Tool definitions
-    # scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
+    scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
     scrape_job_posting_tool = ScrapeWebsiteTool(website_url=job_url)
     semantic_search_resume = PDFSearchTool(pdf=local_resume_file_path)
     
@@ -89,17 +89,11 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         print(local_resume_file_path)
     
     # Add tools to the tasks
-    profiler.tools = [
-        # scrape_linkedin_tool,
-        semantic_search_resume]
+    profiler.tools = [scrape_linkedin_tool, semantic_search_resume]
     job_researcher.tools = [scrape_job_posting_tool]
-    cover_letter_writer.tools = [
-        # scrape_linkedin_tool, 
-        scrape_job_posting_tool, semantic_search_resume]
+    cover_letter_writer.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
     cover_letter_reviewer.tools = [scrape_job_posting_tool]
-    qa_agent.tools = [
-        # scrape_linkedin_tool,
-        scrape_job_posting_tool, semantic_search_resume]
+    qa_agent.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
     
     # set up observer to watch for file changes
     crew_log_file = f'data/{session_id}/crew_log.txt'
@@ -114,17 +108,17 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     cover_letter_crew = Crew(
         agents=[
                 profiler,
-                # job_researcher,
-                # cover_letter_writer,
-                # cover_letter_reviewer,
-                # qa_agent
+                job_researcher,
+                cover_letter_writer,
+                cover_letter_reviewer,
+                qa_agent
                 ],
         tasks=[
                 profile_task,
-                # research_task,
-                # cover_letter_compose_task,
-                # review_cover_letter_task,
-                # check_consistency_task
+                research_task,
+                cover_letter_compose_task,
+                review_cover_letter_task,
+                check_consistency_task
             ],
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
                                temperature=0.7),
@@ -149,10 +143,10 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     # write output files to gcs bucket
     bucket_dir = 'data/' + session_id
     upload_to_gcs('cover-letter-bucket', bucket_dir + '/candidate_profile.txt', bucket_dir + '/candidate_profile.txt')
-    # upload_to_gcs('cover-letter-bucket', bucket_dir + '/job_requirements.txt', bucket_dir + '/job_requirements.txt')
-    # upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter.txt', bucket_dir + '/cover_letter.txt')
-    # upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter_review.txt', bucket_dir + '/cover_letter_review.txt')
-    # upload_to_gcs('cover-letter-bucket', bucket_dir + '/consistency_report.txt', bucket_dir + '/consistency_report.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/job_requirements.txt', bucket_dir + '/job_requirements.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter.txt', bucket_dir + '/cover_letter.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter_review.txt', bucket_dir + '/cover_letter_review.txt')
+    upload_to_gcs('cover-letter-bucket', bucket_dir + '/consistency_report.txt', bucket_dir + '/consistency_report.txt')
     
     self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
     return {'status': 'Task completed!', 'result': result}

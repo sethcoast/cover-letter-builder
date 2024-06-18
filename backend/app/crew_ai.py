@@ -153,7 +153,7 @@ profile_task = Task(
         "Be sure to extract ALL information from the resume. "
         "The profile should be tailored to the candidate's domain. "
         "Ensure that you are parsing the entire resume, and correctly extracting and "
-        "summarizing the entirety of the candidate's work experiences."
+        "summarizing the entirety of the candidate's work experiences. "
     ),
     agent=profiler,
     # async_execution=True
@@ -184,7 +184,10 @@ cover_letter_compose_task = Task(
         "relevant areas. Employ tools to adjust and enhance the "
         "cover letter content. Make sure the cover letter is written"
         "specifically for the role described in the job posting ({job_posting_url})"
-        "and includes only truthful information (i.e. do not make up information)."
+        "and includes only truthful information (i.e. do not make up information). "
+        "The cover letter should be tailored to the specific role and company, "
+        "expressing why the candidate is interested in the role and how their experience aligns with the job requirements. "
+        "Use the information from the candidate's resume ({resume_path}) to express why they are a good fit for the role."
     ),
     expected_output=(
         "A cover letter which matches the following prompt:"
