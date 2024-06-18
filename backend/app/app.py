@@ -60,17 +60,17 @@ celery = make_celery(app)
 @celery.task(bind=True)
 def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, session_id):
     self.update_state(state='PROGRESS', meta={'status': 'Crew AI is running...'})
-    cover_letter_inputs = {
-        'job_posting_url': job_url,
-        'resume_path': resume_file_path,
-        'linkedin_url': linkedin_url,
-    }
-    
     # create temporary directory for storing output files from the Crew AI
     os.makedirs('data/' + session_id, exist_ok=True)
     # load resume file from GCS into local directory
-    download_from_gcs('cover-letter-bucket', resume_file_path, resume_file_path)
+    local_resume_file_path = os.path.abspath(resume_file_path)
+    download_from_gcs('cover-letter-bucket', resume_file_path, local_resume_file_path)
     
+    cover_letter_inputs = {
+        'job_posting_url': job_url,
+        'resume_path': local_resume_file_path,
+        'linkedin_url': linkedin_url,
+    }
     
     # reassign the path of the output files for each of the tasks
     profile_task.output_file = 'data/' + session_id + '/candidate_profile.txt'
@@ -82,7 +82,11 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     # Tool definitions
     scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
     scrape_job_posting_tool = ScrapeWebsiteTool(website_url=job_url)
-    semantic_search_resume = PDFSearchTool(pdf=resume_file_path)
+    semantic_search_resume = PDFSearchTool(pdf=local_resume_file_path)
+    
+    if os.path.exists(local_resume_file_path):
+        print("File found!")
+        print(local_resume_file_path)
     
     # Add tools to the tasks
     profiler.tools = [scrape_linkedin_tool, semantic_search_resume]
@@ -104,17 +108,17 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     cover_letter_crew = Crew(
         agents=[
                 profiler,
-                job_researcher,
-                cover_letter_writer,
-                cover_letter_reviewer,
-                qa_agent
+                # job_researcher,
+                # cover_letter_writer,
+                # cover_letter_reviewer,
+                # qa_agent
                 ],
         tasks=[
                 profile_task,
-                research_task,
-                cover_letter_compose_task,
-                review_cover_letter_task,
-                check_consistency_task
+                # research_task,
+                # cover_letter_compose_task,
+                # review_cover_letter_task,
+                # check_consistency_task
             ],
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
                                temperature=0.7),
