@@ -2,9 +2,15 @@
 
 ![Screenshot of the Cover Letter Generator App](images/app-screenshot.png)
 
-This React web app leverages a team of AI agents to craft personalized cover letters, demonstrating my expertise in AI development and natural language processing. It's designed to showcase my skills to potential employers and serve as a valuable portfolio piece.
+This React web app leverages a team of AI agents to craft personalized cover letters, demonstrating my expertise in AI development and natural language processing. It's designed to showcase my AI engineering skills and look cute in my portfolio (see note below).
 
 **Live Demo:** https://cover-letter-builder-delta.vercel.app/
+
+NOTE:
+
+* Currently the production version of the app is only using a single Celery worker on a single GCP VM. This is because the app is only meant to showcase my abilities as an AI and AI systems engineer, and not meant to serve hundreds of users (vms aren't free!!). If you are a job candidate and wish to use the functionality of this repo, please download and use the prototype jupyter notebook located in this repo.
+
+[Prototype Code (Jupyter Notebook)](backend/notebooks/job_application_crew_V2.ipynb)
 
 ## Features
 
@@ -53,12 +59,6 @@ This React web app leverages a team of AI agents to craft personalized cover let
 * Demonstrate proficiency in React, natural language processing, GCP, and AI development.
 * Highlight my understanding of how to structure and deploy a production-ready AI application.
 * Provide a unique and valuable tool that could potentially benefit recruiters and candidates alike.
-
-## NOTES
-
-* Currently the production version of the app is only using a single Celery worker on a single GCP VM. This is because the app is only meant to showcase my abilities as an AI and AI systems engineer, and not meant to serve hundreds of users (vms aren't free!!). If you are a job candidate and wish to use the functionality of this repo, please download and use the jupyter notebook located in backend/notebooks/job_application_crew_V2.ipynb.
-
-[Prototype Code (Jupyter Notebook)](backend/notebooks/job_application_crew_V2.ipynb)
 
 ## Thanks
 Special shoutout and thanks to João Moura, CrewAI, and Deeplearning.AI for their course [Multi AI Agent Systems with crewAI](https://www.deeplearning.ai/short-courses/multi-ai-agent-systems-with-crewai/) which I followed closely to create the prototype for this app.
