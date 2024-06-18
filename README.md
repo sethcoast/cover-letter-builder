@@ -31,18 +31,21 @@ This React web app leverages a team of AI agents to craft personalized cover let
 
 ## Technologies Used
 
-* **React:** Front-end framework for building the user interface.
-* **Vite:** Fast development server for a smooth development experience.
-* **Vercel:** Hosting platform for deploying the live application.
+### Back-end
 * **Flask:** For the backend application
-* **CrewAI:**  For building and managing the AI agents.
-* **LangChain:** For text analysis and generation.
+* **CrewAI:** For building and managing the AI agents.
+* **LangChain:** For text tools.
+* **Docker:** For building and deploying the flask app.
+* **Cloud Run:** For continuous integration and deployment (in conjunction with Docker).
 * **Celery:** For asynchronous execution of AI crews on the backend
 * **SocketIO:** For streaming CrewAI execution logs to the front end
 * **Redis:** For facilitating both SocketIO and Celery workers
-* **Cloud Run:** For continuous integration and deployment
 * **Google Cloud Storage:** For facilitating uploading and downloading of user/crew documents
 
+### Front-end
+* **React:** Front-end framework for building the user interface.
+* **Vite:** Fast development server for a smooth development experience.
+* **Vercel:** Hosting platform for deploying the live application.
 
 ## Project Goals (For Recruiters)
 
