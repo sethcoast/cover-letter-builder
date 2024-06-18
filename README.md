@@ -1,4 +1,4 @@
-# AI-Powered Cover Letter Builder 🤖
+# AI-Powered Cover Letter Generator
 
 ![Screenshot of the Cover Letter Generator App](images/app-screenshot.png)
 
