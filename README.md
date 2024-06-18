@@ -19,7 +19,7 @@ This React web app leverages a team of AI agents to craft personalized cover let
 1. **Input:**
    - Candidate's LinkedIn profile URL
    - Job posting URL
-   - Candidate's resume (PDF or DOCX)
+   - Candidate's resume (PDF)
 
 2. **AI Processing:**
    - The AI crew analyzes the input data, extracting relevant information and identifying key points.
