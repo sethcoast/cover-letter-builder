@@ -406,7 +406,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter_review.txt', bucket_dir + '/cover_letter_review.txt')
     upload_to_gcs('cover-letter-bucket', bucket_dir + '/consistency_report.txt', bucket_dir + '/consistency_report.txt')
     
-    cover_letter_crew.clear_cache() 
+    # cover_letter_crew.clear_cache() 
     self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
     return {'status': 'Task completed!', 'result': result}
     
