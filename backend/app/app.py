@@ -16,6 +16,7 @@ from .config import Config
 # from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
 from .gcs import download_from_gcs, upload_to_gcs
 from copy import deepcopy
+import agentops
 import redis
 import logging
 import ssl
@@ -67,6 +68,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
     os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
+    agentops.init(os.getenv("AGENTOPS_API_KEY"))
 
     # Agent Definitions
     profiler = Agent(
@@ -406,7 +408,8 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     upload_to_gcs('cover-letter-bucket', bucket_dir + '/cover_letter_review.txt', bucket_dir + '/cover_letter_review.txt')
     upload_to_gcs('cover-letter-bucket', bucket_dir + '/consistency_report.txt', bucket_dir + '/consistency_report.txt')
     
-    # cover_letter_crew.clear_cache() 
+    # cover_letter_crew.clear_cache()
+    agentops.end_session("Success")
     self.update_state(state='SUCCESS', meta={'status': 'Task completed!', 'result': result})
     return {'status': 'Task completed!', 'result': result}
     
