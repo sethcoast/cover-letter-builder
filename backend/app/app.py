@@ -384,7 +384,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         # process=Process.sequential,
         verbose=True,
         memory=False,
-        cache=True,
+        # cache=True,
         output_log_file=crew_log_file
     )
     
