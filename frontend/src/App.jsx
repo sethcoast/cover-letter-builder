@@ -202,6 +202,10 @@ function App() {
     <div className="App">
       <ToastContainer />
       <h1>Cover Letter Generator</h1>
+      <p>WOW, big response to this!</p>
+      <p>Thanks everyone for checking this out but the current system is overloaded.</p>
+      <p>Need to take it offline for a bit to refactor some of the backend configuration.</p>
+      <p>Will be back soon!</p>
       <div className="input-group">
         <label>Job Posting URL:</label>
         <input type="text" value={jobUrl} onChange={handleJobUrlChange} />
