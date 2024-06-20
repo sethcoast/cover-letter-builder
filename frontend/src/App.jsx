@@ -55,8 +55,8 @@ const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
 }
 
 function App() {
-  const [jobUrl, setJobUrl] = useState(''); // https://www.workatastartup.com/jobs/66658
-  const [linkedinUrl, setLinkedinUrl] = useState(''); // https://www.linkedin.com/in/seth-donaldson/
+  const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658'); // https://www.workatastartup.com/jobs/66658
+  const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/seth-donaldson/'); // https://www.linkedin.com/in/seth-donaldson/
   const [resumeFile, setResumeFile] = useState(null);
   const [logs, setLogs] = useState('');
   const [taskId, setTaskId] = useState(null);
@@ -221,7 +221,7 @@ function App() {
       <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
       <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
       <OutputFiles taskStatus={taskStatus} onClick={handleDownloadOutputFile} />
-      {/* <button onClick={handleCancelExecution}>Cancel Execution</button> */}
+      <button onClick={handleCancelExecution}>Cancel Execution</button>
     </div>
   );
 }
