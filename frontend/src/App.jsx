@@ -55,8 +55,8 @@ const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
 }
 
 function App() {
-  const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658'); // https://www.workatastartup.com/jobs/66658
-  const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/seth-donaldson/'); // https://www.linkedin.com/in/seth-donaldson/
+  const [jobUrl, setJobUrl] = useState(''); // https://www.workatastartup.com/jobs/66658
+  const [linkedinUrl, setLinkedinUrl] = useState(''); // https://www.linkedin.com/in/seth-donaldson/
   const [resumeFile, setResumeFile] = useState(null);
   const [logs, setLogs] = useState('');
   const [taskId, setTaskId] = useState(null);
@@ -202,10 +202,10 @@ function App() {
     <div className="App">
       <ToastContainer />
       <h1>Cover Letter Generator</h1>
-      <p>WOW, big response to this!</p>
+      {/* <p>WOW, big response to this!</p>
       <p>Thanks everyone for checking this out but the current system is overloaded.</p>
       <p>Need to take it offline for a bit to refactor some of the backend configuration.</p>
-      <p>Will be back soon!</p>
+      <p>Will be back soon!</p> */}
       <div className="input-group">
         <label>Job Posting URL:</label>
         <input type="text" value={jobUrl} onChange={handleJobUrlChange} />
@@ -221,7 +221,7 @@ function App() {
       <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
       <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
       <OutputFiles taskStatus={taskStatus} onClick={handleDownloadOutputFile} />
-      <button onClick={handleCancelExecution}>Cancel Execution</button>
+      {/* <button onClick={handleCancelExecution}>Cancel Execution</button> */}
     </div>
   );
 }
