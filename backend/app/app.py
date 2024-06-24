@@ -110,9 +110,9 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
     scrape_job_posting_tool = ScrapeWebsiteTool(website_url=job_url)
     semantic_search_resume = PDFSearchTool(pdf=local_resume_file_path)
-    scrape_linkedin_tool.cache_function = lambda _args, _result: False
-    scrape_job_posting_tool.cache_function = lambda _args, _result: False
-    semantic_search_resume.cache_function = lambda _args, _result: False
+    # scrape_linkedin_tool.cache_function = lambda _args, _result: False
+    # scrape_job_posting_tool.cache_function = lambda _args, _result: False
+    # semantic_search_resume.cache_function = lambda _args, _result: False
     
     if os.path.exists(local_resume_file_path):
         print("File found!")
