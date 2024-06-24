@@ -14,6 +14,7 @@ from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler, FileModifiedEvent
 from .config import Config
 from .gcs import download_from_gcs, upload_to_gcs
+from .session_pdf_search_tool import SessionPDFSearchTool
 from copy import deepcopy
 import agentops
 import redis
@@ -109,7 +110,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     # Tool definitions
     scrape_linkedin_tool = ScrapeWebsiteTool(website_url=linkedin_url)
     scrape_job_posting_tool = ScrapeWebsiteTool(website_url=job_url)
-    semantic_search_resume = PDFSearchTool(pdf=local_resume_file_path)
+    semantic_search_resume = SessionPDFSearchTool(pdf=local_resume_file_path, session_id=session_id)
     # scrape_linkedin_tool.cache_function = lambda _args, _result: False
     # scrape_job_posting_tool.cache_function = lambda _args, _result: False
     # semantic_search_resume.cache_function = lambda _args, _result: False

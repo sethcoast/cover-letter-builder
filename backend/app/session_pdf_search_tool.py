@@ -14,11 +14,17 @@ from crewai_tools.tools.rag.rag_tool import Adapter
 class SessionEmbedchainAdapter(Adapter):
     embedchain_app: App
     summarize: bool = False
+    session_id: Optional[str] = None
 
     def query(self, question: str) -> str:
-        result, sources = self.embedchain_app.query(
-            question, citations=True, dry_run=(not self.summarize)
-        )
+        if self.session_id:
+            result, sources = self.embedchain_app.query(
+                question, citations=True, dry_run=(not self.summarize), where={"session_id": self.session_id}
+            )
+        else:
+            result, sources = self.embedchain_app.query(
+                question, citations=True, dry_run=(not self.summarize)
+            )
         if self.summarize:
             return result
         return "\n\n".join([source[0] for source in sources])
@@ -28,7 +34,11 @@ class SessionEmbedchainAdapter(Adapter):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self.embedchain_app.add(*args, **kwargs)
+        if "metadata" in kwargs:
+            self.embedchain_app.add(*args, metadata=kwargs["metadata"])
+            self.session_id = kwargs["metadata"]["session_id"]
+        else:
+            self.embedchain_app.add(*args, **kwargs)
 
 class SessionPDFSearchTool(RagTool):
     name: str = "Search a PDF's content"
@@ -37,25 +47,26 @@ class SessionPDFSearchTool(RagTool):
     )
     args_schema: Type[BaseModel] = PDFSearchToolSchema
 
-    def __init__(self, pdf: Optional[str] = None, **kwargs):
+    def __init__(self, pdf: Optional[str] = None, session_id: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
+        self.session_id = session_id
         
         if pdf is not None:
             self.add(pdf)
-            self.description = f"A tool that can be used to semantic search a query the {pdf} PDF's content."
+            self.description = f"A tool that can be used to semantic search a query the {pdf} PDF's content, associated with session id {session_id}."
             self.args_schema = FixedPDFSearchToolSchema
             self._generate_description()
         
             
-    # @model_validator(mode="after")
-    # def _set_default_adapter(self):
-    #     if isinstance(self.adapter, RagTool._AdapterPlaceholder):
-    #         app = App.from_config(config=self.config) if self.config else App()
-    #         self.adapter = SessionEmbedchainAdapter(
-    #             embedchain_app=app, summarize=self.summarize
-    #         )
+    @model_validator(mode="after")
+    def _set_default_adapter(self):
+        if isinstance(self.adapter, RagTool._AdapterPlaceholder):
+            app = App.from_config(config=self.config) if self.config else App()
+            self.adapter = SessionEmbedchainAdapter(
+                embedchain_app=app, summarize=self.summarize
+            )
 
-    #     return self
+        return self
 
     def add(
         self,
@@ -63,6 +74,9 @@ class SessionPDFSearchTool(RagTool):
         **kwargs: Any,
     ) -> None:
         kwargs["data_type"] = DataType.PDF_FILE
+        if self.session_id:
+            kwargs["metadata"] = {"session_id": self.session_id}
+            print("session_id added: ", self.session_id)
         super().add(*args, **kwargs)
 
     def _before_run(
