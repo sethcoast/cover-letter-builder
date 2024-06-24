@@ -218,7 +218,7 @@ function App() {
         <label>Resume PDF:</label>
         <input type="file" accept="application/pdf" onChange={handleResumeFileChange} />
       </div>
-      {/* <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button> */}
+      <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
       <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
       <OutputFiles taskStatus={taskStatus} onClick={handleDownloadOutputFile} />
       <button onClick={handleCancelExecution}>Cancel Execution</button>
