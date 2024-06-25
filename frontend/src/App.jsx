@@ -55,8 +55,8 @@ const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
 }
 
 function App() {
-  const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658'); // https://www.workatastartup.com/jobs/66658
-  const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/drea-ferreira-donaldson/'); // https://www.linkedin.com/in/seth-donaldson/
+  const [jobUrl, setJobUrl] = useState(''); // https://www.workatastartup.com/jobs/66658
+  const [linkedinUrl, setLinkedinUrl] = useState(''); // https://www.linkedin.com/in/seth-donaldson/
   const [resumeFile, setResumeFile] = useState(null);
   const [logs, setLogs] = useState('');
   const [taskId, setTaskId] = useState(null);
