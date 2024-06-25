@@ -56,7 +56,7 @@ const CrewOutput = ({crewOutputRef, logs, taskStatus}) => {
 
 function App() {
   const [jobUrl, setJobUrl] = useState('https://www.workatastartup.com/jobs/66658'); // https://www.workatastartup.com/jobs/66658
-  const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/seth-donaldson/'); // https://www.linkedin.com/in/seth-donaldson/
+  const [linkedinUrl, setLinkedinUrl] = useState('https://www.linkedin.com/in/drea-ferreira-donaldson/'); // https://www.linkedin.com/in/seth-donaldson/
   const [resumeFile, setResumeFile] = useState(null);
   const [logs, setLogs] = useState('');
   const [taskId, setTaskId] = useState(null);
@@ -218,7 +218,7 @@ function App() {
         <label>Resume PDF:</label>
         <input type="file" accept="application/pdf" onChange={handleResumeFileChange} />
       </div>
-      {/* <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button> */}
+      <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
       <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
       <OutputFiles taskStatus={taskStatus} onClick={handleDownloadOutputFile} />
       <button onClick={handleCancelExecution}>Cancel Execution</button>
