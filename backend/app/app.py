@@ -120,9 +120,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
         print(local_resume_file_path)
     
     # Add tools to the tasks
-    profiler.tools = [
-        # scrape_linkedin_tool, 
-        semantic_search_resume]
+    profiler.tools = [scrape_linkedin_tool, semantic_search_resume]
     job_researcher.tools = [scrape_job_posting_tool]
     cover_letter_writer.tools = [scrape_linkedin_tool, scrape_job_posting_tool, semantic_search_resume]
     cover_letter_reviewer.tools = [scrape_job_posting_tool]
