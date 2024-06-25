@@ -17,7 +17,7 @@ profiler = Agent(
     verbose=True,
     allow_delegation=True,
     backstory=(
-        "In the ever-evolving landscape of artificial intelligence and machine learning, standing out is more "
+        "In today's job market, standing out is more "
         "challenging than ever. Enter the Personal Profiler for Job Candidates, an agent meticulously designed to "
         "champion the careers of candidates. Born from the collaborative efforts of leading career strategists "
         "and data scientists, this agent possesses a deep understanding of both the technical and human elements that "
