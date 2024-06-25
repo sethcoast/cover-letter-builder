@@ -28,7 +28,6 @@ load_dotenv()
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["SERPER_API_KEY"] = os.getenv("SERPER_API_KEY")
-agentops_key = os.getenv("AGENTOPS_API_KEY")
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -72,6 +71,7 @@ def crew_write_cover_letter_task(self, job_url, linkedin_url, resume_file_path, 
     from .crew_ai import profiler, job_researcher, cover_letter_writer, cover_letter_reviewer, qa_agent, profile_task, research_task, cover_letter_compose_task, review_cover_letter_task, check_consistency_task#, assemble_and_kickoff_crew
     self.update_state(state='PROGRESS', meta={'status': 'Initializing Crew...'})
     
+    agentops_key = os.getenv("AGENTOPS_API_KEY")
     if agentops_key is not None:
         print("Agentops key found!")
     agentops.init(agentops_key)
