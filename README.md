@@ -1,4 +1,4 @@
-# AI-Powered Cover Letter Generator
+# AI-Agent Cover Letter Generator (LLMs, RAG, AI agents)
 
 **Live Demo:** https://cover-letter-builder-delta.vercel.app/
 
