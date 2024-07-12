@@ -43,6 +43,7 @@ NOTE:
 * **Flask:** For the backend application
 * **CrewAI:** For building and managing the AI agents.
 * **Embedchain:** For embedding PDFs and performing RAG on them.
+* **Chromadb:** The vector database for embedding PDFs and performing RAG.
 * **Docker:** For building and deploying the flask app.
 * **Cloud Run:** For continuous integration and deployment (in conjunction with Docker).
 * **Celery:** For asynchronous execution of AI crews on the backend
