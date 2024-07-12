@@ -13,4 +13,7 @@ dump.rdb
 .venv
 backend/notebooks/data
 backend/notebooks/crew_log.txt
+data/*
+db/*
 frontend/.env.*
+.vscode/*
