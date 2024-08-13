@@ -202,10 +202,10 @@ function App() {
     <div className="App">
       <ToastContainer />
       <h1>Cover Letter Generator</h1>
-      {/* <p>WOW, big response to this!</p>
-      <p>Thanks everyone for checking this out but the current system is overloaded.</p>
-      <p>Need to take it offline for a bit to refactor some of the backend configuration.</p>
-      <p>Will be back soon!</p> */}
+      {/* <p>WOW, big response to this!</p> */}
+      <p>Thanks everyone for checking this out, but the app is temporarily offline.</p>
+      <p>It was too expensive for me to keep alive indefinitely, but if you want to use the functionality of this app, please check out the jupyter notebook in the github repo (linked below).</p>
+      <p><a href="https://github.com/sethcoast/cover-letter-builder/blob/main/backend/notebooks/job_application_crew_v2.ipynb">Jupyter Notebook</a></p>
       <div className="input-group">
         <label>Job Posting URL:</label>
         <input type="text" value={jobUrl} onChange={handleJobUrlChange} />
@@ -218,10 +218,10 @@ function App() {
         <label>Resume PDF:</label>
         <input type="file" accept="application/pdf" onChange={handleResumeFileChange} />
       </div>
-      <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
+      {/* <button onClick={handleGenerateCoverLetter}>Generate Cover Letter</button>
       <CrewOutput crewOutputRef={crewOutputRef} logs={logs} taskStatus={taskStatus} />
       <OutputFiles taskStatus={taskStatus} onClick={handleDownloadOutputFile} />
-      <button onClick={handleCancelExecution}>Cancel Execution</button>
+      <button onClick={handleCancelExecution}>Cancel Execution</button> */}
     </div>
   );
 }
